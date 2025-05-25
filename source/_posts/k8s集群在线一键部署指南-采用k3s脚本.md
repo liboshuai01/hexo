@@ -94,7 +94,7 @@ systemctl disable firewalld
 
 ```shell
 # 例如:
-# nano /etc/hosts
+# vim /etc/hosts
 
 192.168.1.100 k3s-master
 192.168.1.101 k3s-node1
@@ -128,8 +128,7 @@ systemctl status k3s
 Master 节点安装成功后，会生成一个 Token，用于 Worker 节点加入集群。在 `k3s-master` 节点上执行以下命令查看 Token：
 
 ```shell
-[root@k3s-master ~]# cat /var/lib/rancher/k3s/server/node-token
-K10xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx::server:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+cat /var/lib/rancher/k3s/server/node-token
 ```
 记下这个 Token 值，后续 Worker 节点加入时会用到。
 
@@ -162,11 +161,7 @@ systemctl status k3s-agent
 在 `k3s-master` 节点上执行以下命令，查看集群节点状态：
 
 ```shell
-[root@k3s-master ~]# kubectl get nodes -o wide
-NAME         STATUS   ROLES                  AGE   VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION          CONTAINER-RUNTIME
-k3s-master   Ready    control-plane,master   10m   v1.28.7+k3s1  192.168.1.100   <none>        CentOS Linux 7 (Core)   3.10.0-1160.el7.x86_64   containerd://1.7.11-k3s2
-k3s-node1    Ready    <none>                 5m    v1.28.7+k3s1  192.168.1.101   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
-k3s-node2    Ready    <none>                 5m    v1.28.7+k3s1  192.168.1.102   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
+kubectl get nodes -o wide
 ```
 如果所有节点都显示 `Ready` 状态，说明集群已成功部署。
 > 注意：`VERSION`、`OS-IMAGE`、`KERNEL-VERSION`等信息会根据您的实际环境有所不同。
@@ -190,20 +185,13 @@ source ~/.bashrc
 
 在 `k3s-master` 节点上执行：
 ```shell
-[root@k3s-master ~]# kubectl label node k3s-node1 node-role.kubernetes.io/worker=worker
-node/k3s-node1 labeled
-
-[root@k3s-master ~]# kubectl label node k3s-node2 node-role.kubernetes.io/worker=worker
-node/k3s-node2 labeled
+kubectl label node k3s-node1 node-role.kubernetes.io/worker=worker
+kubectl label node k3s-node2 node-role.kubernetes.io/worker=worker
 ```
 
 再次查看节点状态：
 ```shell
-[root@k3s-master ~]# kubectl get nodes -o wide
-NAME         STATUS   ROLES                  AGE   VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION          CONTAINER-RUNTIME
-k3s-master   Ready    control-plane,master   15m   v1.28.7+k3s1  192.168.1.100   <none>        CentOS Linux 7 (Core)   3.10.0-1160.el7.x86_64   containerd://1.7.11-k3s2
-k3s-node1    Ready    worker                 10m   v1.28.7+k3s1  192.168.1.101   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
-k3s-node2    Ready    worker                 10m   v1.28.7+k3s1  192.168.1.102   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
+kubectl get nodes -o wide
 ```
 现在 `ROLES` 列已经正确显示为 `worker`。
 
