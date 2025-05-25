@@ -82,10 +82,10 @@ K3s 是由 Rancher Labs（现为 SUSE 的一部分）精心打造的一款轻量
 #### a. 关闭防火墙（简化演示，生产环境请配置精确规则）
 
 ```shell
-systemctl stop firewalld
-systemctl disable firewalld
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
 # 对于 Ubuntu/Debian 系统
-# ufw disable
+# sudo ufw disable
 ```
 
 #### b. 配置主机名解析（如果无DNS）
@@ -94,7 +94,7 @@ systemctl disable firewalld
 
 ```shell
 # 例如:
-# nano /etc/hosts
+# sudo vim /etc/hosts
 
 192.168.1.100 k3s-master
 192.168.1.101 k3s-node1
@@ -111,16 +111,16 @@ systemctl disable firewalld
 
 ```shell
 # 官方安装脚本
-curl -sfL https://get.k3s.io | sh -
+curl -sfL https://get.k3s.io | sudo sh -s -
 
 # 中国大陆用户，可以使用以下镜像加速安装：
-# curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn sh -
+# curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn sudo sh -s -
 ```
 
 安装完成后，K3s 服务会自动启动。您可以检查服务状态：
 
 ```shell
-systemctl status k3s
+sudo systemctl status k3s
 ```
 
 ### 3. 获取 Master 节点的 Token
@@ -128,8 +128,7 @@ systemctl status k3s
 Master 节点安装成功后，会生成一个 Token，用于 Worker 节点加入集群。在 `k3s-master` 节点上执行以下命令查看 Token：
 
 ```shell
-[root@k3s-master ~]# cat /var/lib/rancher/k3s/server/node-token
-K10xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx::server:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 记下这个 Token 值，后续 Worker 节点加入时会用到。
 
@@ -139,71 +138,51 @@ K10xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx::server:yyyyyy
 
 ```shell
 # 将 YOUR_MASTER_IP_OR_HOSTNAME 和 YOUR_NODE_TOKEN 替换为实际值
-curl -sfL https://get.k3s.io | K3S_URL=https://YOUR_MASTER_IP_OR_HOSTNAME:6443 K3S_TOKEN=YOUR_NODE_TOKEN sh -
+curl -sfL https://get.k3s.io | K3S_URL=https://YOUR_MASTER_IP_OR_HOSTNAME:6443 K3S_TOKEN=YOUR_NODE_TOKEN sudo sh -s -
 
 # 中国大陆用户，可以使用以下镜像加速安装：
-# curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_URL=https://YOUR_MASTER_IP_OR_HOSTNAME:6443 K3S_TOKEN=YOUR_NODE_TOKEN sh -
+# curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_URL=https://YOUR_MASTER_IP_OR_HOSTNAME:6443 K3S_TOKEN=YOUR_NODE_TOKEN sudo sh -s -
 ```
 
 例如，对于 `k3s-node1`，如果 Master IP 是 `192.168.1.100`，Token 是 `K10...::server:yyy...`：
 ```shell
 # 示例:
-# curl -sfL https://get.k3s.io | K3S_URL=https://192.168.1.100:6443 K3S_TOKEN=K10xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx::server:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy sh -
+# curl -sfL https://get.k3s.io | K3S_URL=https://192.168.1.100:6443 K3S_TOKEN=K10xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx::server:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy sudo sh -s -
 ```
 
 安装完成后，K3s Agent 服务会自动启动。您可以检查服务状态：
 
 ```shell
-systemctl status k3s-agent
+sudo systemctl status k3s-agent
 ```
 
-### 5. 验证集群状态
+### 5. 非root用户执行K3s集群的kubectl命令
+
+请查看另一篇博文：[非root用户执行K3s集群的kubectl命令](https://lbs.wiki/pages/96dde92b/)
+
+### 6. 验证集群状态
 
 在 `k3s-master` 节点上执行以下命令，查看集群节点状态：
 
 ```shell
-[root@k3s-master ~]# kubectl get nodes -o wide
-NAME         STATUS   ROLES                  AGE   VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION          CONTAINER-RUNTIME
-k3s-master   Ready    control-plane,master   10m   v1.28.7+k3s1  192.168.1.100   <none>        CentOS Linux 7 (Core)   3.10.0-1160.el7.x86_64   containerd://1.7.11-k3s2
-k3s-node1    Ready    <none>                 5m    v1.28.7+k3s1  192.168.1.101   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
-k3s-node2    Ready    <none>                 5m    v1.28.7+k3s1  192.168.1.102   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
+kubectl get nodes -o wide
 ```
 如果所有节点都显示 `Ready` 状态，说明集群已成功部署。
 > 注意：`VERSION`、`OS-IMAGE`、`KERNEL-VERSION`等信息会根据您的实际环境有所不同。
 
-### 6. 配置 `kubectl` (Master 节点)
-
-K3s 会自动在 Master 节点的 `/etc/rancher/k3s/k3s.yaml` 生成 kubeconfig 文件。`kubectl` 命令也会自动配置好，可以直接使用。
-为了方便 Helm 等其他工具识别，或者在非 root 用户下使用 `kubectl`，可以将 kubeconfig 路径添加到环境变量：
-
-```shell
-echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> ~/.bashrc
-source ~/.bashrc
-```
-这样，您就可以在 Master 节点上直接使用 `kubectl` 命令管理集群了。
-
-如果您想从其他机器远程管理 K3s 集群，可以将 `/etc/rancher/k3s/k3s.yaml` 文件复制到远程机器的 `~/.kube/config`，并修改其中的 `server` 地址为 Master 节点的外部可访问 IP 或域名。
-
-### 7. 为 Worker 节点打上角色标签 (可选)
+### 8. 为 Worker 节点打上角色标签 (可选)
 
 默认情况下，Worker 节点的 `ROLES` 列可能显示为 `<none>`。您可以为它们打上 `worker` 标签，以更清晰地标识其角色：
 
 在 `k3s-master` 节点上执行：
 ```shell
-[root@k3s-master ~]# kubectl label node k3s-node1 node-role.kubernetes.io/worker=worker
-node/k3s-node1 labeled
-
-[root@k3s-master ~]# kubectl label node k3s-node2 node-role.kubernetes.io/worker=worker
-node/k3s-node2 labeled
+kubectl label node k3s-node1 node-role.kubernetes.io/worker=worker
+kubectl label node k3s-node2 node-role.kubernetes.io/worker=worker
 ```
 
 再次查看节点状态：
 ```shell
-[root@k3s-master ~]# kubectl get nodes -o wide
-NAME         STATUS   ROLES                  AGE   VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION          CONTAINER-RUNTIME
-k3s-master   Ready    control-plane,master   15m   v1.28.7+k3s1  192.168.1.100   <none>        CentOS Linux 7 (Core)   3.10.0-1160.el7.x86_64   containerd://1.7.11-k3s2
-k3s-node1    Ready    worker                 10m   v1.28.7+k3s1  192.168.1.101   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
-k3s-node2    Ready    worker                 10m   v1.28.7+k3s1  192.168.1.102   <none>        Ubuntu 20.04.3 LTS      5.4.0-150-generic       containerd://1.7.11-k3s2
+kubectl get nodes -o wide
 ```
 现在 `ROLES` 列已经正确显示为 `worker`。
 
@@ -216,7 +195,7 @@ k3s-node2    Ready    worker                 10m   v1.28.7+k3s1  192.168.1.102  
 在每个 Worker 节点（例如 `k3s-node1`、`k3s-node2`）上执行以下命令：
 
 ```shell
-/usr/local/bin/k3s-agent-uninstall.sh
+sudo /usr/local/bin/k3s-agent-uninstall.sh
 ```
 该脚本会停止 K3s Agent 服务，并清理相关文件和目录。
 
@@ -225,7 +204,7 @@ k3s-node2    Ready    worker                 10m   v1.28.7+k3s1  192.168.1.102  
 在 Master 节点（例如 `k3s-master`）上执行以下命令：
 
 ```shell
-/usr/local/bin/k3s-uninstall.sh
+sudo /usr/local/bin/k3s-uninstall.sh
 ```
 该脚本会停止 K3s Server 服务，并清理相关文件、目录和数据（包括 `/var/lib/rancher/k3s` 目录）。
 
