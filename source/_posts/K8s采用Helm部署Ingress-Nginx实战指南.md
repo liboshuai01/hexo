@@ -4,6 +4,8 @@ tags:
   - Linux
   - K8s
   - Helm
+  - Nginx
+  - Ingress-Nginx
 categories:
   - 容器化
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505061122195.png'
