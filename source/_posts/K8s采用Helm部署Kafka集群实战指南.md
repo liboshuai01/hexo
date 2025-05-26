@@ -13,71 +13,92 @@ abbrlink: 84c192a2
 date: 2025-05-09 16:59:31
 ---
 
-Apache Kafka 作为一款高性能、分布式的发布订阅消息系统，广泛应用于大数据、实时计算、日志收集等场景。在 Kubernetes (K8s) 环境中部署和管理 Kafka 集群，Helm 无疑是一个强大且便捷的工具。本文将详细介绍如何使用 Helm 在 K8s 上部署 Bitnami 提供的 Kafka Helm Chart，并通过**命令行参数覆盖**的方式进行定制化配置，辅以脚本实现自动化部署与管理，并集成 Prometheus ServiceMonitor 进行监控。
+Apache Kafka 是一个高性能、分布式的发布-订阅消息系统，广泛应用于实时数据管道和流式应用。在 Kubernetes (K8s) 环境中部署 Kafka 可以充分利用其弹性伸缩、自我修复和声明式配置等优势。Helm 作为 K8s 的包管理器，则大大简化了 Kafka 集群的部署和管理过程。
 
-**前提条件:**
-
-1.  **已就绪的 Kubernetes 集群:** 确保你有一个正常运行的 K8s 集群。
-2.  **Helm 已安装:** Helm V3 版本，并已配置好与 K8s 集群的连接。
-3.  **kubectl 已安装:** 用于与 K8s 集群交互。
-4.  **StorageClass 已配置:** 集群中需要有一个可用的 StorageClass 用于持久化存储。本文示例中将使用名为 `nfs-storage` 的 StorageClass。
-5.  **(可选但推荐) Prometheus Stack 已安装:** 如果您希望使用 ServiceMonitor 自动发现 Kafka JMX 指标，确保您的集群中已安装 `kube-prometheus-stack` 或类似的 Prometheus Operator 解决方案。脚本中的 `PROM_STACK_RELEASE_NAME` 和 `PROM_STACK_NAMESPACE` 需要与您的 Prometheus 安装相匹配。
+本指南将详细介绍如何使用 Helm 和 Bitnami提供的 Kafka Helm Chart，在 Kubernetes 集群上部署一个生产可用的 Kafka 集群（基于 KRaft模式，无需 ZooKeeper）。我们将使用提供的脚本和配置文件来自动化部署流程。
 
 <!-- more -->
 
-### 步骤一：准备 Helm 环境和确认 Chart 版本
+## 前提准备
 
-在开始之前，我们需要确保 Helm 仓库已添加并更新，以便获取最新的 Chart 信息。我们的部署脚本 (`install.sh`) 会自动处理这一步。
+在开始之前，请确保您已具备以下条件：
 
-脚本中，我们将指定 Bitnami Kafka Chart 的版本。在新的 `install.sh` 脚本中，我们使用变量 `KAFKA_CHART_VERSION` 来定义版本，默认为 `32.2.8`。你可以使用 `helm search repo bitnami/kafka --versions` 查看所有可用版本，并根据需要调整脚本中的版本号。
+1.  **一个正在运行的 Kubernetes 集群**：版本建议 1.20+。
+2.  **`kubectl` 命令行工具**：并已配置为指向您的 K8s 集群。
+3.  **Helm 客户端**：版本建议 v3+。
+4.  **一个可用的 StorageClass**：本指南默认使用名为 `nfs` 的 StorageClass。如果您的集群中没有或使用其他名称，请相应修改 `.env` 文件。
+5.  **下载/准备相关脚本**：确保您已拥有以下文件：
+    *   `.env`：配置文件
+    *   `install.sh`：安装/升级脚本
+    *   `status.sh`：状态检查脚本
+    *   `uninstall.sh`：卸载脚本
 
-```shell
-# install.sh 脚本中的相关命令 (在脚本执行时会自动运行)
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+## 项目文件结构与说明
+
+我们的部署将围绕以下几个核心文件展开：
+
+*   `.env`：环境变量配置文件，用于定义命名空间、Helm Release 名称、Chart 版本和存储类等。
+*   `install.sh`：核心部署脚本，负责添加 Helm 仓库、更新仓库，并使用 Helm 安装或升级 Kafka 集群。
+*   `status.sh`：用于快速检查已部署 Kafka 集群中 Pod 和 PVC 的状态。
+*   `uninstall.sh`：用于卸载 Kafka 集群。
+
+下面是这些文件的具体内容。
+
+### 配置文件: `.env`
+
+此文件定义了部署 Kafka 集群所需的关键参数。
+
+```ini
+# 命名空间名称
+NAMESPACE="kafka"
+# helm的release名称
+RELEASE_NAME="my-kafka-cluster"
+# helm的chart版本
+CHART_VERSION="32.2.8"
+# 存储类名称
+STORAGE_CLASS_NAME="nfs"
 ```
 
-要确认您希望使用的 StorageClass (脚本中默认为 `nfs-storage`) 是否存在，可以执行：
-```shell
-kubectl get storageclass
-```
-输出应类似：
-```
-NAME                    PROVISIONER                                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
-nfs-storage (default)   cluster.local/nfs-subdir-external-provisioner   Delete          Immediate           true                   6d16h
-```
-如果你的 StorageClass 名称不同，请相应修改脚本中的 `STORAGE_CLASS` 变量值。
+**参数说明：**
 
-### 步骤二：理解并准备部署脚本 (`install.sh`)
+*   `NAMESPACE`：Kafka 集群将要部署到的 Kubernetes 命名空间。如果该命名空间不存在，`install.sh` 脚本会尝试创建它。
+*   `RELEASE_NAME`：Helm Release 的名称，用于唯一标识本次部署。
+*   `CHART_VERSION`：要使用的 Bitnami Kafka Helm Chart 的版本。
+*   `STORAGE_CLASS_NAME`：用于持久化存储的 Kubernetes StorageClass 名称。请确保您的集群中存在此 StorageClass，或者修改为您环境中可用的 StorageClass。
 
-之前我们通过修改 `values.yaml` 文件来定制 Kafka 集群。现在，我们将采用一种更直接和自动化的方式：使用 `helm install` 命令的 `--set` 或 `--set-string` 参数在部署时直接覆盖 Chart 的默认值，并通过脚本变量进行管理。
+您可以根据您的需求修改这些值。
 
-以下是我们的 `install.sh` 脚本，它包含了部署 Kafka 集群所需的所有配置，并集成了 Prometheus ServiceMonitor：
+## 步骤一：配置环境变量
+
+如上所示，请根据您的实际环境修改 `.env` 文件中的值。
+
+## 步骤二：安装 Kafka 集群
+
+配置好 `.env` 文件后，我们可以执行 `install.sh` 脚本来部署 Kafka 集群。
+
+### 安装脚本: `install.sh`
 
 ```shell
 #!/usr/bin/env bash
 
-# 添加 Bitnami Helm 仓库并更新
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
+
+# --- 添加仓库并更新 ---
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
-# --- 配置变量 ---
-# Kafka 安装相关
-KAFKA_RELEASE_NAME="kafka-cluster"
-KAFKA_NAMESPACE="kafka-cluster"
-KAFKA_CHART_VERSION="32.2.8" # 请确认这是您希望使用的稳定版本
-STORAGE_CLASS="nfs-storage"
-
-# Prometheus Stack 的 Release 名称 (必须与你安装 kube-prometheus-stack 时使用的 RELEASE_NAME 一致)
-PROM_STACK_RELEASE_NAME="kube-prom-stack"
-PROM_STACK_NAMESPACE="monitoring" # ServiceMonitor将创建在这个命名空间
-
-# --- 安装 Kafka 集群 ---
-helm install ${KAFKA_RELEASE_NAME} bitnami/kafka --version ${KAFKA_CHART_VERSION} \
-  --namespace ${KAFKA_NAMESPACE} \
+# --- 安装 / 升级 ---
+helm upgrade --install ${RELEASE_NAME} bitnami/kafka --version ${CHART_VERSION} \
+  --namespace ${NAMESPACE} \
   --create-namespace \
   \
-  --set-string global.defaultStorageClass="${STORAGE_CLASS}" \
+  --set-string global.defaultStorageClass="${STORAGE_CLASS_NAME}" \
   \
   --set listeners.client.protocol=PLAINTEXT \
   --set listeners.client.sslClientAuth=none \
@@ -88,241 +109,233 @@ helm install ${KAFKA_RELEASE_NAME} bitnami/kafka --version ${KAFKA_CHART_VERSION
   --set listeners.external.protocol=PLAINTEXT \
   --set listeners.external.sslClientAuth=none \
   \
+  --set defaultInitContainers.prepareConfig.resources.requests.cpu=100m \
+  --set defaultInitContainers.prepareConfig.resources.requests.memory=128Mi \
+  --set defaultInitContainers.prepareConfig.resources.limits.cpu=250m \
+  --set defaultInitContainers.prepareConfig.resources.limits.memory=512Mi \
+  \
   --set controller.replicaCount=3 \
   --set controller.persistence.enabled=true \
   --set controller.persistence.size=16Gi \
   --set controller.logPersistence.enabled=true \
-  --set controller.logPersistence.size=8Gi \
-  \
-  --set metrics.jmx.enabled=true \
-  --set metrics.serviceMonitor.enabled=true \
-  --set metrics.serviceMonitor.namespace=${PROM_STACK_NAMESPACE} \
-  --set metrics.serviceMonitor.labels.release=${PROM_STACK_RELEASE_NAME}
-  # 如果需要分离的 Broker 节点 (KRaft 提供的 Dedicated Broker Mode)，请取消注释并配置以下参数
+  --set controller.logPersistence.size=4Gi \
+  --set controller.resources.requests.cpu=250m \
+  --set controller.resources.requests.memory=512Mi \
+  --set controller.resources.limits.cpu=1000m \
+  --set controller.resources.limits.memory=2048Mi \
+  # 如果需要分离的 Broker 节点 (KRaft 提供的 Dedicated Broker Mode)，请取消注释并配置以下参数 \
   # --set broker.replicaCount=3 \
   # --set broker.persistence.enabled=true \
-  # --set broker.persistence.size=16Gi \
+  # --set broker.persistence.size=32Gi \
   # --set broker.logPersistence.enabled=true \
   # --set broker.logPersistence.size=8Gi \
-
-echo ""
-echo "Kafka 集群 (${KAFKA_RELEASE_NAME}) 安装/升级过程已启动到命名空间 '${KAFKA_NAMESPACE}'。"
-echo "JMX metrics 已启用。"
-echo "ServiceMonitor 将创建在命名空间 '${PROM_STACK_NAMESPACE}' 中，并带有标签 'release: ${PROM_STACK_RELEASE_NAME}'。"
-echo "---------------------------------------------------------------------"
-echo "监控 Pod 状态: kubectl get pods -n ${KAFKA_NAMESPACE} -w"
-echo "检查 Service (JMX metrics): kubectl get svc -n ${KAFKA_NAMESPACE} | grep jmx"
-echo "检查 ServiceMonitor: kubectl get servicemonitor -n ${PROM_STACK_NAMESPACE} ${KAFKA_RELEASE_NAME}-jmx-metrics"
-echo "检查 Prometheus Targets: 访问 Prometheus UI 的 Targets 页面 (例如 http://<prometheus-host>/targets)"
-echo "---------------------------------------------------------------------"
-echo "如果遇到问题, 请检查 Prometheus Operator 日志: kubectl logs -n ${PROM_STACK_NAMESPACE} -l app.kubernetes.io/name=prometheus-operator -c prometheus-operator"
+  # --set broker.resources.requests.cpu=250m \
+  # --set broker.resources.requests.memory=512Mi \
+  # --set broker.resources.limits.cpu=1000m \
+  # --set broker.resources.limits.memory=2048Mi
 ```
 
-**脚本变量和关键参数说明：**
-
-*   **脚本变量:**
-    *   `KAFKA_RELEASE_NAME`: Helm Release 的名称，默认为 `kafka-cluster`。
-    *   `KAFKA_NAMESPACE`: Kafka 集群部署的命名空间，默认为 `kafka-cluster`。
-    *   `KAFKA_CHART_VERSION`: Bitnami Kafka Chart 的版本，默认为 `32.2.8`。
-    *   `STORAGE_CLASS`: 用于持久化存储的 StorageClass 名称，默认为 `nfs-storage`。
-    *   `PROM_STACK_RELEASE_NAME`: 您环境中 `kube-prometheus-stack` 的 Helm Release 名称。**请务必修改此变量以匹配您的实际环境**，否则 ServiceMonitor 可能不会被 Prometheus Operator 正确识别。
-    *   `PROM_STACK_NAMESPACE`: `kube-prometheus-stack` 部署的命名空间，ServiceMonitor CRD 将创建于此，默认为 `monitoring`。
-
-*   `--set-string global.defaultStorageClass="${STORAGE_CLASS}"`: 全局指定默认的 StorageClass。使用 `--set-string` 确保其被视为字符串。
-*   `listeners.*.protocol=PLAINTEXT` 和 `listeners.*.sslClientAuth=none`: 将所有监听器的通信协议设置为 `PLAINTEXT` 并禁用 SSL。**这在测试或内部环境中可以简化部署，但在生产环境中强烈建议启用 SSL/SASL 以保证通信安全。**
-*   `controller.replicaCount=3`: 设置 Controller 节点数量为3 (KRaft 模式下，若不分离 Broker，则这些节点同时扮演 Controller 和 Broker 角色)。
-*   `controller.persistence.*` 和 `controller.logPersistence.*`: 为 Controller (及 Combined Mode下的 Broker) 节点启用并配置数据和日志的持久化。
-*   **Broker 节点配置 (注释部分)**: 用于 KRaft "Dedicated Mode"，即 Controller 和 Broker 节点分离。
-*   `metrics.jmx.enabled=true`: 启用 JMX Exporter，暴露 Kafka 指标。
-*   `metrics.serviceMonitor.enabled=true`: 启用 ServiceMonitor 资源的创建。
-*   `metrics.serviceMonitor.namespace=${PROM_STACK_NAMESPACE}`: 指定 ServiceMonitor 资源创建在 Prometheus Operator 所在的命名空间（通常是 `monitoring`）。
-*   `metrics.serviceMonitor.labels.release=${PROM_STACK_RELEASE_NAME}`: 为 ServiceMonitor 添加标签，通常 Prometheus Operator 会使用这个标签 (例如 `release=<prometheus-stack-release-name>`) 来发现和匹配 ServiceMonitor。**确保 `${PROM_STACK_RELEASE_NAME}` 与您安装 `kube-prometheus-stack` 时使用的 `release` 名称一致。**
-
-你可以将上述内容保存为 `install.sh` 文件。
-
-### 步骤三：部署 Kafka 集群
-
-在执行脚本之前，确保它有执行权限：
+**执行安装：**
 
 ```shell
-chmod +x install.sh
+bash install.sh
 ```
 
-然后，**根据您的环境修改 `install.sh` 脚本中的 `PROM_STACK_RELEASE_NAME` 和 `PROM_STACK_NAMESPACE` (如果需要)**，然后运行脚本来部署 Kafka 集群：
+**脚本解析：**
 
-```shell
-./install.sh
-```
+1.  **加载变量**：从 `.env` 文件中读取配置并将其导出为环境变量。
+2.  **添加 Helm 仓库**：添加 Bitnami 的 Helm Chart 仓库。
+3.  **更新 Helm 仓库**：确保本地 Helm 仓库信息是最新的。
+4.  **安装/升级 Kafka**：使用 `helm upgrade --install` 命令部署 Kafka。
+    *   各种 `--set` 参数用于自定义 Kafka Chart 的配置，包括：
+        *   设置全局默认的存储类。
+        *   为所有监听器（client, controller, interbroker, external）配置为 `PLAINTEXT` 协议，并禁用 SSL 客户端认证。**警告：这简化了初始设置，但在生产环境中，对于外部访问或跨网络通信，应考虑启用 SSL/TLS 加密和认证。**
+        *   配置 `prepare-config` 初始化容器的资源请求和限制。
+        *   设置 KRaft 控制器节点的副本数为3，并为其启用持久化存储（数据卷和日志卷）。
+        *   为控制器节点配置资源请求和限制。
+        *   注释部分提供了配置专用 Broker 节点的选项，用于 KRaft 的 "Dedicated Broker Mode"。
 
-部署命令执行后，Helm 会输出部署状态和一些有用的信息。脚本末尾也会打印出检查 Kafka 和 ServiceMonitor 状态的常用命令。
-Helm 输出的 `NOTES` 部分也会包含 Kafka 客户端如何连接和测试集群的信息，例如：
+等待 Helm 命令执行完成。如果一切顺利，Kafka 集群就会成功部署到您的 Kubernetes 集群中。
 
-```
-NAME: kafka-cluster
-LAST DEPLOYED: Wed May 10 10:05:00 2025 # 时间会是你执行的时间
-NAMESPACE: kafka-cluster
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-NOTES:
-CHART NAME: kafka
-CHART VERSION: 32.2.8
-APP VERSION: 4.0.0 # App Version 可能会根据Chart版本变动
+## 步骤三：初步验证
 
-Did you know there are enterprise versions of the Bitnami catalog? For enhanced secure software supply chain features, unlimited pulls from Docker, LTS support, or application customization, see Bitnami Premium or Tanzu Application Catalog. See https://www.arrow.com/globalecs/na/vendors/bitnami for more information.
+部署完成后，我们可以执行 `status.sh` 脚本来快速检查 Kafka 相关资源的状态。
 
-** Please be patient while the chart is being deployed **
+### 状态检查脚本: `status.sh`
 
-Kafka can be accessed by consumers via port 9092 on the following DNS name from within your cluster:
-
-    kafka-cluster.kafka-cluster.svc.cluster.local
-
-Each Kafka broker can be accessed by producers via port 9092 on the following DNS name(s) from within your cluster:
-
-    kafka-cluster.kafka-cluster.svc.cluster.local:9092
-    kafka-cluster-controller-0.kafka-cluster-controller-headless.kafka-cluster.svc.cluster.local:9092
-    # ... (其他 controller/broker headless service 地址)
-
-To create a pod that you can use as a Kafka client run the following commands:
-
-    kubectl run kafka-cluster-client --restart='Never' --image docker.io/bitnami/kafka:4.0.0-debian-12-r3 --namespace kafka-cluster --command -- sleep infinity # Image tag 可能随 App Version 变化
-    kubectl exec --tty -i kafka-cluster-client --namespace kafka-cluster -- bash
-
-    PRODUCER:
-        kafka-console-producer.sh \
-            --bootstrap-server kafka-cluster.kafka-cluster.svc.cluster.local:9092 \
-            --topic test
-
-    CONSUMER:
-        kafka-console-consumer.sh \
-            --bootstrap-server kafka-cluster.kafka-cluster.svc.cluster.local:9092 \
-            --topic test \
-            --from-beginning
-
-WARNING: There are "resources" sections in the chart not set. Using "resourcesPreset" is not recommended for production...
-+info https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-```
-
-### 步骤四：验证和测试 Kafka 集群
-
-部署完成后，等待所有 Pod 变为 `Running` 状态。你可以使用脚本输出中提示的命令或我们准备的 `status.sh` 脚本查看所有相关资源：
-
-**`status.sh` 脚本内容：**
 ```shell
 #!/usr/bin/env bash
 
-# 使用 install.sh 中定义的变量 (如果 status.sh 与 install.sh 在同一目录或已 source install.sh)
-# 如果独立运行，请直接替换变量或在此处定义它们
-KAFKA_NAMESPACE="kafka-cluster"
-KAFKA_RELEASE_NAME="kafka-cluster" # 与 install.sh 中的 KAFKA_RELEASE_NAME 保持一致
-PROM_STACK_NAMESPACE="monitoring" # 与 install.sh 中的 PROM_STACK_NAMESPACE 保持一致
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
 
-echo "--- Pods in ${KAFKA_NAMESPACE} ---"
-kubectl get pods -n ${KAFKA_NAMESPACE} -w # -w 用于持续监控，按Ctrl+C退出
-
-echo "--- All resources in ${KAFKA_NAMESPACE} ---"
-kubectl get all -n ${KAFKA_NAMESPACE}
-
-echo "--- PVCs in ${KAFKA_NAMESPACE} ---"
-kubectl get pvc -n ${KAFKA_NAMESPACE}
-
-echo "--- JMX Service in ${KAFKA_NAMESPACE} ---"
-kubectl get svc -n ${KAFKA_NAMESPACE} | grep jmx
-
-echo "--- ServiceMonitor in ${PROM_STACK_NAMESPACE} for ${KAFKA_RELEASE_NAME} ---"
-kubectl get servicemonitor -n ${PROM_STACK_NAMESPACE} ${KAFKA_RELEASE_NAME}-jmx-metrics -o yaml
-# (ServiceMonitor 的名称可能为 ${KAFKA_RELEASE_NAME}-metrics 或其他，具体取决于 Chart)
-# 针对 Bitnami Kafka Chart 32.2.8, ServiceMonitor 名称默认为 ${KAFKA_RELEASE_NAME}-jmx-metrics
-
-echo "--- Check Prometheus Targets page for Kafka endpoints ---"
-echo "Visit your Prometheus UI (e.g., via port-forward or Ingress) and check the 'Targets' page."
-
-echo "--- If ServiceMonitor issues, check Prometheus Operator logs in ${PROM_STACK_NAMESPACE} ---"
-kubectl logs -n ${PROM_STACK_NAMESPACE} -l app.kubernetes.io/name=prometheus-operator -c prometheus-operator --tail=100
+kubectl get all -n ${NAMESPACE}
+kubectl get pvc -n ${NAMESPACE}
 ```
-保存为 `status.sh`，添加执行权限 (`chmod +x status.sh`)，然后运行 `./status.sh`。
 
-当看到 `kafka-cluster-controller-0`, `kafka-cluster-controller-1`, `kafka-cluster-controller-2` 等 Pods 都处于 `Running` 状态时，集群基本就绪。
+**执行状态检查：**
 
-**测试 Kafka 功能：** (根据 Helm NOTES 中的镜像版本调整，如果不同)
+```shell
+bash status.sh
+```
+
+**脚本解析：**
+
+该脚本会执行以下命令：
+
+*   `kubectl get all -n ${NAMESPACE}`：显示指定命名空间下的所有 Kubernetes 资源 (Pods, Services, StatefulSets, etc.)。
+*   `kubectl get pvc -n ${NAMESPACE}`：显示指定命名空间下的持久卷声明 (PersistentVolumeClaims)。
+
+您应该能看到类似以下的输出（具体 Pod 名称和数量可能因配置而异）：
+
+*   Controller Pods (例如 `my-kafka-cluster-controller-0`, `my-kafka-cluster-controller-1`, `my-kafka-cluster-controller-2`) 状态为 `Running`。
+*   对应的 PVCs 状态为 `Bound`。
+*   Kafka 服务（如 `my-kafka-cluster`, `my-kafka-cluster-headless`）已创建。
+
+## 步骤四：进阶验证 (生产与消费消息)
+
+为了进一步确认 Kafka 集群工作正常，我们将创建一个临时的客户端 Pod，并在其中创建 Topic、发送消息和消费消息。
+
 1.  **启动客户端 Pod：**
+    请根据您 `install.sh` 执行后，Helm 输出的 NOTES 部分或最新 Bitnami Kafka Chart 文档推荐的镜像版本进行调整。此处的镜像是示例。
+
     ```shell
-    # 请根据您helm install输出的NOTES部分提供的镜像名和标签进行调整
-    kubectl run kafka-cluster-client --restart='Never' --image docker.io/bitnami/kafka:4.0.0-debian-12-r3 --namespace kafka-cluster --command -- sleep infinity
+    # 将 .env 文件中的 NAMESPACE 变量值替换到下面的命令中
+    # 例如 kubectl run kafka-test-client ... --namespace kafka ...
+    kubectl run kafka-test-client \
+        --restart='Never' \
+        --image docker.io/bitnami/kafka:4.0.0-debian-12-r3 \
+        --namespace ${NAMESPACE} \
+        --command -- sleep infinity
     ```
-2.  **进入客户端 Pod 的 shell：**
+    **注意：** 请将命令中的 `${NAMESPACE}` 手动替换为 `.env` 文件中 `NAMESPACE` 的实际值，或者在执行前确保 `NAMESPACE` 环境变量已正确导出。
+
+2.  **等待客户端 Pod 启动并进入其 Shell：**
+
     ```shell
-    kubectl exec --tty -i kafka-cluster-client --namespace kafka-cluster -- bash
+    # 检查 Pod 状态 (替换 ${NAMESPACE})
+    kubectl get pod kafka-test-client -n ${NAMESPACE}
+    # 进入 Pod Shell (替换 ${NAMESPACE})
+    kubectl exec --tty -i kafka-test-client --namespace ${NAMESPACE} -- bash
     ```
-3.  **在客户端 Pod 内，创建一个测试topic：**
+
+3.  **在客户端 Pod 内，创建一个测试 Topic：**
+    Kafka 的 Bootstrap Server 地址通常是 `<RELEASE_NAME>:<PORT>` 或 `<RELEASE_NAME>-headless:<PORT>`。对于我们的配置，Client Listener 默认监听在 9092 端口。
+
     ```shell
+    # 将 .env 文件中的 RELEASE_NAME 变量值替换到下面的命令中
+    # 例如 --bootstrap-server my-kafka-cluster:9092
+    # 对于3节点的combined mode集群，副本因子最大为3
     kafka-topics.sh \
         --create \
-        --bootstrap-server kafka-cluster.kafka-cluster.svc.cluster.local:9092 \
-        --topic test \
+        --bootstrap-server ${RELEASE_NAME}:9092 \
+        --topic test_topic \
         --partitions 6 \
-        --replication-factor 3 # 对于3节点的combined mode集群，副本因子最大为3
+        --replication-factor 3
     ```
+    **注意：** 请将命令中的 `${RELEASE_NAME}` 手动替换为 `.env` 文件中 `RELEASE_NAME` 的实际值，或者在执行前确保 `RELEASE_NAME` 环境变量已正确导出。
+    如果命令成功，会提示 `Created topic test_topic.`。
+
 4.  **在客户端 Pod 内，启动生产者发送消息：**
+
     ```shell
+    # 将 .env 文件中的 RELEASE_NAME 变量值替换到下面的命令中
     kafka-console-producer.sh \
-        --bootstrap-server kafka-cluster.kafka-cluster.svc.cluster.local:9092 \
-        --topic test
+        --bootstrap-server ${RELEASE_NAME}:9092 \
+        --topic test_topic
     ```
-    输入消息: `>Hello Kafka from New Script`
-5.  **在客户端 Pod 内，启动消费者接收消息 (新开一个终端执行 kubectl exec...)：**
+    替换 `${RELEASE_NAME}`。然后，您可以输入一些消息，例如：
+    `>Hello Kafka from K8s!`
+    `>This is a test message.`
+    按 `Ctrl+C` 退出生产者。
+
+5.  **（新开一个终端）在客户端 Pod 内，启动消费者接收消息：**
+    为了同时观察生产者和消费者，请打开一个新的本地终端窗口，然后再次 `kubectl exec` 进入同一个 `kafka-test-client` Pod。
+
     ```shell
+    # 在新终端执行 (替换 ${NAMESPACE}):
+    kubectl exec --tty -i kafka-test-client --namespace ${NAMESPACE} -- bash
+
+    # 在 Pod 内执行 (替换 ${RELEASE_NAME}):
     kafka-console-consumer.sh \
-        --bootstrap-server kafka-cluster.kafka-cluster.svc.cluster.local:9092 \
-        --topic test \
+        --bootstrap-server ${RELEASE_NAME}:9092 \
+        --topic test_topic \
         --from-beginning
     ```
-    你应该能看到发送的消息。
+    您应该能看到之前通过生产者发送的消息。
 
-**验证 JMX 指标和 ServiceMonitor：**
-*   执行 `./status.sh` 或 `install.sh` 脚本输出的检查命令。
-*   确保 `kubectl get servicemonitor -n ${PROM_STACK_NAMESPACE} ${KAFKA_RELEASE_NAME}-jmx-metrics` 能够找到 ServiceMonitor。
-*   在 Prometheus UI 的 "Status" -> "Targets" 页面，你应该能看到 Kafka 相关的 Endpoints，并且状态是 UP。
+6.  **删除客户端 Pod：**
+    验证完成后，可以删除测试用的客户端 Pod。
 
-### 步骤五：卸载 Kafka 集群
+    ```shell
+    # 替换 ${NAMESPACE}
+    kubectl delete pod kafka-test-client --namespace ${NAMESPACE}
+    ```
 
-如果需要卸载 Kafka 集群，可以使用提供的 `uninstall.sh` 脚本。我们对其进行修改以使用与 `install.sh` 中相同的变量：
+## 步骤五：更新应用
 
-**`uninstall.sh` 脚本内容：**
+如果您需要修改 Kafka 集群的配置（例如，调整资源限制、更改副本数、升级 Chart 版本等），可以：
+
+1.  修改 `.env` 文件中的变量（如 `CHART_VERSION`）。
+2.  或直接修改 `install.sh` 文件中的 `--set` 参数。
+3.  然后重新执行 `install.sh` 脚本：
+
+    ```shell
+    bash install.sh
+    ```
+    Helm 的 `upgrade --install` 命令会智能地应用更改，如果 Release 不存在则安装，如果存在则升级。
+
+## 步骤六：卸载应用
+
+如果不再需要 Kafka 集群，可以按照以下步骤卸载：
+
+### 卸载脚本: `uninstall.sh`
+
 ```shell
 #!/usr/bin/env bash
 
-# --- 配置变量 (与 install.sh 保持一致) ---
-KAFKA_RELEASE_NAME="kafka-cluster"
-KAFKA_NAMESPACE="kafka-cluster"
-# PROM_STACK_NAMESPACE="monitoring" # ServiceMonitor 会随 Helm release 一起删除
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
 
-helm uninstall ${KAFKA_RELEASE_NAME} -n ${KAFKA_NAMESPACE}
-
-echo ""
-echo "Kafka cluster (${KAFKA_RELEASE_NAME}) uninstallation initiated from namespace '${KAFKA_NAMESPACE}'."
-echo "The ServiceMonitor '${KAFKA_RELEASE_NAME}-jmx-metrics' in namespace '${PROM_STACK_NAMESPACE}' (if it existed and was managed by this chart) should also be deleted."
-echo "Persistent Volume Claims (PVCs) might need to be manually deleted if reclaimPolicy is not Delete."
-echo "Check with: kubectl get pvc -n ${KAFKA_NAMESPACE}"
-echo "Also verify ServiceMonitor deletion: kubectl get servicemonitor -n ${PROM_STACK_NAMESPACE} ${KAFKA_RELEASE_NAME}-jmx-metrics"
+helm uninstall ${RELEASE_NAME} -n ${NAMESPACE}
 ```
-保存为 `uninstall.sh`，添加执行权限 (`chmod +x uninstall.sh`)，然后运行：
-```shell
-./uninstall.sh
-```
-这将删除由 Helm Chart创建的所有 Kubernetes 资源，包括 ServiceMonitor。注意：根据 StorageClass 的 `reclaimPolicy`，PVCs 可能不会被自动删除。
 
-### 重要提示和后续步骤
+**执行卸载：**
 
-*   **资源限制 (Resources Warning):** Helm 的输出提示中有一个 `WARNING` 指出 `"resources" sections in the chart not set`。在生产环境中，强烈建议根据您的工作负载需求，在 `install.sh` 脚本中通过 `--set controller.resources.requests.cpu=...` 等参数为相关组件配置明确的CPU和内存资源。
-*   **Prometheus 配置:** 确保 `install.sh`中的 `PROM_STACK_RELEASE_NAME` 和 `PROM_STACK_NAMESPACE` 与您环境中 `kube-prometheus-stack` (或其他 Prometheus Operator 实现) 的配置完全匹配，否则 ServiceMonitor 不会被 Prometheus 自动发现。
-*   **安全性:** 本指南为了简化部署，禁用了 SSL/SASL。在生产环境中，务必启用这些安全特性。
-*   **外部访问:** 如需从 K8s 集群外部访问 Kafka，需配置 `listeners.external`。
-*   **KRaft 模式:** Bitnami Kafka Chart 较新版本默认使用 KRaft 模式。
-*   **脚本化管理的优势:** 使用脚本进行部署和卸载，可以确保操作的一致性、可重复性，便于版本控制和自动化集成。
+1.  **执行卸载脚本：**
 
-### 总结
+    ```shell
+    bash uninstall.sh
+    ```
+    此脚本会执行 `helm uninstall ${RELEASE_NAME} -n ${NAMESPACE}`，它将删除所有由该 Helm Release 创建的 Kubernetes 资源（StatefulSets, Services, ConfigMaps 等）。
 
-通过 Helm 结合命令行参数覆盖，并将其封装在shell脚本中，我们可以实现对 Kubernetes 上 Kafka 集群的快速、规范且自动化的部署和管理，同时还能轻松集成 Prometheus 监控。通过调整脚本中的变量和 `--set` 参数，可以灵活地定制 Kafka 集群的各项配置。记住，在生产部署前，务必仔细评估安全配置、资源分配、监控集成和高可用性策略。
+2.  **（可选）删除持久卷声明 (PVCs)：**
+    默认情况下，Helm 卸载操作不会删除 PVCs，以防止数据丢失。如果您确定不再需要这些数据，可以手动删除它们。
+
+    ```shell
+    # 查看指定命名空间下的 PVCs (替换 ${NAMESPACE})
+    kubectl get pvc -n ${NAMESPACE}
+   
+    # 删除pvc (替换 ${NAMESPACE} 和 [pvc名称])
+    # 例如: kubectl delete pvc data-my-kafka-cluster-controller-0 -n kafka
+    kubectl delete pvc [pvc名称] -n ${NAMESPACE}
+    ```
+    请**谨慎操作**此步骤，确保数据已备份或不再需要。
+
+## 总结
+
+通过本指南，我们学习了如何使用提供的脚本和配置文件，借助 Helm 在 Kubernetes 上快速部署和管理一个基于 KRaft 模式的 Kafka 集群。这种方法不仅简化了初始部署，也方便了后续的配置更新和集群维护。
+
+您可以进一步探索 Bitnami Kafka Helm Chart 的丰富配置选项，以满足更复杂的生产需求，例如启用 TLS 加密、配置认证授权、集成监控和日志系统等。祝您在 Kubernetes 上使用 Kafka 顺利！
 
 ---
