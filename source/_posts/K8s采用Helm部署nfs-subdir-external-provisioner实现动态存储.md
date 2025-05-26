@@ -1,5 +1,5 @@
 ---
-title: K8s采用Helm部署NFS-Client-Provisioner实现动态存储
+title: K8s采用Helm部署nfs-subdir-external-provisioner实现动态存储
 tags:
   - Linux
   - K8s
