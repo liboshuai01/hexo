@@ -12,459 +12,368 @@ abbrlink: e3673e0e
 date: 2025-05-05 10:43:17                                                                                                                                                               
 ---
 
-在自建 Kubernetes 集群时，为实现持久化存储，NFS 是一种常见且稳定的选择。为了方便管理和自动化动态存储，NFS Client Provisioner（即 nfs-client-provisioner）成为了社区推荐的解决方案。
-本文将详细介绍如何在 Kubernetes 集群中通过 Helm 部署 nfs-client-provisioner（及其继任者 nfs-subdir-external-provisioner），并演示其基本使用方法。
+在Kubernetes (K8s) 集群中，动态存储卷配置 (Dynamic Volume Provisioning) 是一项核心功能，它允许根据 PersistentVolumeClaim (PVC) 的请求自动创建 PersistentVolume (PV)。`nfs-subdir-external-provisioner` 是一个广受欢迎的外部存储供应器，它利用您现有的NFS服务器，为每个PVC在NFS共享目录下创建一个子目录作为PV。
+
+本文将详细介绍如何准备NFS环境，并使用Helm v3在K8s集群中部署 `nfs-subdir-external-provisioner`，配置其为默认的 StorageClass。
 
 <!-- more -->
 
-## 环境信息
+> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/nfs-subdir-external-provisioner)
 
-> 笔者系统环境为: RockyLinux 8.10
+## 前提条件
 
-| 主机名        | IP     | 角色     |
-|------------|--------|--------|
-| k8s-master | master | master |
-| k8s-node1  | node1  | node01 |
-| k8s-node2  | node2  | node02 |
+在开始之前，请确保您已具备以下条件：
 
-## 安装前准备工作
+1.  一个正常运行的 Kubernetes 集群 (本指南中会涉及部分节点操作，如安装NFS客户端和搭建NFS服务端)。
+2.  已安装并配置好 Helm v3+ 客户端。
+3.  对 `kubectl` 和 `helm` 命令有基本了解。
+4.  Linux系统管理基础，特别是 `yum` 包管理和 `systemd` 服务管理。
 
-### 安装 NFS 客户端
+## 1. NFS 环境准备
 
-所有 Kubernetes 节点上都需要安装 NFS 客户端工具以便挂载 NFS 共享目录：
+`nfs-subdir-external-provisioner` 依赖于一个已配置好的NFS服务器和在Kubernetes节点上安装的NFS客户端。
 
+### 1.1 安装 NFS 客户端
+
+所有 Kubernetes 节点（包括 Master 和 Worker 节点，如果它们都需要挂载NFS卷）上都需要安装 NFS 客户端工具，以便能够挂载 NFS 共享目录。
+
+在所有相关节点上执行：
 ```bash
 yum install -y nfs-utils
 ```
+**命令解析:**
+*   `yum install -y nfs-utils`: 使用 `yum` 包管理器安装 `nfs-utils` 包。该包提供了支持NFS所需的工具，如 `mount.nfs`。 `-y` 参数表示自动确认安装。
 
-### 搭建 NFS 服务器
+### 1.2 搭建 NFS 服务器
 
-本示例选择 `k8s-master` 作为 NFS 服务端节点，进行如下配置：
+您可以选择集群中的一个节点或一个独立的服务器作为NFS服务端。本示例选择 `k8s-master` 节点作为NFS服务端进行配置。**请注意，在生产环境中，推荐使用专用的、高可用的NFS服务器。**
 
-#### 安装 rpcbind 服务
+#### 1.2.1 安装 rpcbind 服务
 
-NFS 服务器需要依赖 `rpcbind` 服务进行远程过程调用绑定，需特别安装并启动：
+NFS 服务器需要依赖 `rpcbind` 服务进行远程过程调用绑定。`rpcbind` 服务将RPC程序号和版本号映射到NFS服务器上的端口号。
 
+在选定的NFS服务器节点上执行：
 ```bash
 yum install -y rpcbind
 systemctl enable rpcbind
 systemctl start rpcbind
 ```
+**命令解析:**
+*   `yum install -y rpcbind`: 安装 `rpcbind` 服务。
+*   `systemctl enable rpcbind`: 设置 `rpcbind` 服务开机自启。
+*   `systemctl start rpcbind`: 立即启动 `rpcbind` 服务。
 
-#### 创建共享目录
+#### 1.2.2 创建共享目录
 
+创建您希望通过NFS共享的目录。`nfs-subdir-external-provisioner` 将在此目录下为每个PV创建子目录。
+
+在NFS服务器节点上执行：
 ```bash
 mkdir -p /data/nfs/k8s
 ```
+**命令解析:**
+*   `mkdir -p /data/nfs/k8s`: 创建目录 `/data/nfs/k8s`。 `-p` 参数确保如果父目录不存在也会一并创建。
 
-#### 配置导出目录
+#### 1.2.3 配置导出目录
 
-编辑 `/etc/exports` 文件，添加共享目录与客户端权限：
+编辑NFS的导出配置文件 `/etc/exports`，指定要共享的目录以及允许访问的客户端和权限。
 
+在NFS服务器节点上，编辑 `/etc/exports` 文件，添加如下内容：
 ```bash
 /data/nfs/k8s *(insecure,rw,sync,no_root_squash)
 ```
+**文件内容解析:**
+*   `/data/nfs/k8s`: 要导出的共享目录路径。
+*   `*`: 表示允许任何IP地址的客户端访问此共享。**在生产环境中，强烈建议将其替换为具体的IP地址或网段以增强安全性**，例如 `192.168.1.0/24`。
+*   `insecure`: 允许客户端使用大于1024的非特权端口进行连接。某些NFS客户端实现需要此选项。
+*   `rw`: 允许客户端对共享目录进行读写操作。
+*   `sync`: 数据会同步写入磁盘和内存，确保数据一致性，但可能会略微影响性能。对于持久化存储，通常推荐使用。
+*   `no_root_squash`: 当客户端以 `root` 用户身份访问共享时，NFS服务器不会将其映射为匿名用户（通常是 `nfsnobody`）。这意味着客户端 `root` 用户在共享目录中拥有与服务器上 `root` 用户相同的权限。**请谨慎使用此选项，确保了解其安全 implications。**
 
-#### 启动 NFS 服务并设置开机自启
+#### 1.2.4 启动 NFS 服务并设置开机自启
 
+安装并启动NFS服务器主服务。
+
+在NFS服务器节点上执行：
 ```bash
+yum install -y nfs-utils # 如果之前未安装，此步骤也会安装
 systemctl enable nfs-server
 systemctl start nfs-server
 ```
+**命令解析:**
+*   `systemctl enable nfs-server`: 设置 `nfs-server` 服务（在某些系统中也可能叫 `nfs`）开机自启。
+*   `systemctl start nfs-server`: 立即启动 `nfs-server` 服务。
 
-确保 `rpcbind` 和 `nfs-server` 两个服务均已启动并自启。
+确保 `rpcbind` 和 `nfs-server` (或 `nfs`) 两个服务均已成功启动并设置为开机自启。您可以使用 `systemctl status rpcbind` 和 `systemctl status nfs-server` 来检查状态。
 
-#### 重新导出共享目录
+#### 1.2.5 重新导出共享目录
 
-使配置生效：
+修改 `/etc/exports` 文件后，需要让NFS服务器重新加载配置以使其生效。
 
+在NFS服务器节点上执行：
 ```bash
 exportfs -r
 exportfs
 ```
+**命令解析:**
+*   `exportfs -r`: 重新读取 `/etc/exports` 文件，并重新导出所有目录。它会同步 `/etc/exports` 与 `/var/lib/nfs/etab` 的内容。
+*   `exportfs`: 不带参数执行时，会显示当前NFS服务器导出的共享目录列表及其配置，可以用来验证配置是否已正确加载。
 
-### 验证 NFS 挂载
+### 1.3 验证 NFS 挂载
 
-在任意工作节点（如 `k8s-node1`）测试挂载：
+完成服务器端配置后，应在至少一个Kubernetes工作节点（或任何已安装NFS客户端的机器）上测试NFS共享是否可以成功挂载和访问。
 
+在任意一个Kubernetes工作节点（例如 `k8s-node1`）上执行：
 ```bash
-mkdir -p /data/nfs/k8s # 如果客户端上此目录不存在，则创建
+# 如果客户端上此目录不存在，则创建作为挂载点
+mkdir -p /data/nfs/k8s 
+
+# 挂载NFS共享，将 "master" 替换为你的NFS服务器IP或主机名
 mount -t nfs master:/data/nfs/k8s /data/nfs/k8s
+
+# 检查挂载是否成功
 df -h | grep /data/nfs/k8s
 ```
+**命令解析:**
+*   `mkdir -p /data/nfs/k8s`: 在客户端节点上创建一个本地目录作为NFS共享的挂载点。
+*   `mount -t nfs master:/data/nfs/k8s /data/nfs/k8s`:
+    *   `-t nfs`: 指定文件系统类型为NFS。
+    *   `master:/data/nfs/k8s`: NFS服务器的地址（此处为 `master`，即我们之前配置的NFS服务器的主机名或IP）和服务器上共享的路径。
+    *   `/data/nfs/k8s`: 客户端本地的挂载点目录。
+*   `df -h | grep /data/nfs/k8s`: 显示磁盘空间使用情况，并通过 `grep` 过滤出与我们挂载点相关的信息。如果挂载成功，这里应该能看到NFS共享的空间信息。
 
-可在服务器端创建文件，客户端查看是否同步。完成验证后可根据需求卸载：
+您可以在服务器端 `${NFS_PATH}`（即 `/data/nfs/k8s`）下创建一个测试文件，然后在客户端挂载点查看该文件是否存在，以验证读写和同步。
 
+完成验证后，如果不需要保持挂载状态，可以卸载：
 ```bash
 umount /data/nfs/k8s
 ```
+**重要提示**: `nfs-subdir-external-provisioner` 运行时，Kubernetes节点上的kubelet会负责实际的NFS挂载操作，因此上述手动挂载测试仅用于验证NFS环境是否配置正确。
 
-## 使用 Helm 安装 NFS Client Provisioner（旧版）
+## 2. 配置环境变量
 
-> **注意：** `nfs-client-provisioner` 已经过时并被官方淘汰，现由 Kubernetes SIGs 维护的新项目 `nfs-subdir-external-provisioner`继任，提供更好的维护支持和功能。**建议使用新版 `nfs-subdir-external-provisioner`。**
+NFS环境准备就绪后，我们开始配置 `nfs-subdir-external-provisioner` 的安装参数。创建一个 `.env` 文件来存放所有配置变量。
 
-### 添加 Helm 仓库
-
-```bash
-helm repo add azure http://mirror.azure.cn/kubernetes/charts/
-helm repo update
+> .env
+```
+# 命名空间
+NAMESPACE="kube-system"
+# helm的release名称
+RELEASE_NAME="nfs-subdir-external-provisioner"
+# helm的chart版本
+CHART_VERSION="4.0.18"
+# nfs服务地址 - 确保此值与您搭建的NFS服务器地址一致
+NFS_SERVER="master"
+# nfs存储路径 - 确保此值与您NFS服务器上配置的共享路径一致
+NFS_PATH="/data/nfs/k8s"
+# 存储类名称
+STORAGE_CLASS_NAME="nfs"
 ```
 
-### 查找 nfs-client-provisioner 版本
+**文件解析:**
 
-```bash
-helm search repo nfs-client-provisioner
-```
+*   `NAMESPACE`: 指定 `nfs-subdir-external-provisioner` 将被安装到的Kubernetes命名空间。
+*   `RELEASE_NAME`: Helm部署实例的名称。
+*   `CHART_VERSION`: 要安装的 `nfs-subdir-external-provisioner` Helm Chart的版本号。
+*   `NFS_SERVER`: 您的NFS服务器的地址。**确保这个值与您在步骤 1.2 中配置的NFS服务器主机名或IP地址一致。**
+*   `NFS_PATH`: NFS服务器上已导出的共享目录路径。**确保这个值与您在步骤 1.2.2 和 1.2.3 中创建并导出的路径一致。**
+*   `STORAGE_CLASS_NAME`: 将要创建的StorageClass的名称。
 
-### 安装 nfs-client-provisioner
+请根据您的实际NFS环境和偏好修改 `.env` 文件中的值。
 
-示例如下，注意替换 `nfs.server` 与 `nfs.path` 至自己的实际 NFS 服务地址和共享路径：
+## 3. 编写安装脚本 (`install.sh`)
 
-```bash
-helm install nfs-storage azure/nfs-client-provisioner \
-  --set nfs.server=master \
-  --set nfs.path=/data/nfs/k8s \
-  --set storageClass.name=nfs-storage \
-  --set storageClass.defaultClass=true \
-  --set rbac.create=true \
-  --namespace kube-system
-```
+我们将使用一个Shell脚本来自动化 `nfs-subdir-external-provisioner` 的安装过程。
 
-- `nfs.server`：NFS 服务器 IP 地址
-- `nfs.path`：NFS 共享目录路径
-- `storageClass.name`：定义创建的存储类名称
-- `storageClass.defaultClass`：是否作为默认存储类
-- `rbac.create`：自动创建 RBAC 资源，需设置为 `true`
-- `namespace`：建议安装在 `kube-system` 命名空间，便于管理
-
-### 设置默认 StorageClass 注意事项 (旧版)
-
-在通过 `--set storageClass.defaultClass=true` 将 `nfs-storage` 设置为默认 StorageClass 后，需确保 Kubernetes 集群中不会有多个
-StorageClass 被标记为默认，否则会引发 PVC 动态绑定冲突。
-
-**例如，常见的本地存储插件 `local-path` 默认也通常是默认 StorageClass**，需要把它的默认标识取消：
-
-```bash
-kubectl patch storageclass local-path \
-  -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-```
-
-执行后可以确认：
-
-```bash
-kubectl get storageclass
-```
-
-此时 `nfs-storage` 应该是唯一带有 `(default)` 标识的存储类。
-
-这样做确保：
-
-- 新建 PVC 如果没有特别指定 `storageClassName`，会默认使用 `nfs-storage`。
-- 避免多个存储类同时为默认，导致 PVC 动态供给异常。
-
-## 使用 Helm 安装 nfs-subdir-external-provisioner（新版）
-
-**推荐方案：**
-`nfs-client-provisioner` 已经过时并被官方淘汰，现由 Kubernetes SIGs 维护的新项目 `nfs-subdir-external-provisioner`
-继任，提供更好的维护支持和功能。
-
-### 添加 Helm 仓库并安装
-
-您可以手动执行以下步骤，或者使用提供的 `install.sh` 脚本来自动化此过程。
-
-1.  **手动添加 Helm 仓库：**
-    首先，添加 `nfs-subdir-external-provisioner` 的 Helm 仓库并更新本地 Helm 仓库列表。
-
-    ```bash
-    helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-    helm repo update
-    ```
-
-2.  **手动安装 nfs-subdir-external-provisioner：**
-    使用 Helm 安装 chart。请务必将 `nfs.server` 和 `nfs.path` 替换为您的 NFS 服务器地址和共享目录。以下命令将安装 `4.0.18` 版本，并将其部署在 `kube-system` 命名空间中（如果不存在则创建），同时创建必要的 RBAC 资源，并将创建的 StorageClass 设置为默认。
-
-    ```bash
-    helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --version 4.0.18 \
-      --namespace kube-system \
-      --create-namespace \
-      --set nfs.server=master \
-      --set nfs.path=/data/nfs/k8s \
-      --set storageClass.name=nfs-storage \
-      --set storageClass.defaultClass=true \
-      --set rbac.create=true
-    ```
-
-    参数说明：
-    *   `--version 4.0.18`: 指定安装的 chart 版本，确保部署的确定性。
-    *   `--namespace kube-system`: 指定安装的命名空间。
-    *   `--create-namespace`: 如果指定的命名空间不存在，则自动创建。
-    *   `nfs.server`: NFS 服务器地址（IP 或主机名）。在此示例中为 `master`。
-    *   `nfs.path`: NFS 共享目录路径。在此示例中为 `/data/nfs/k8s`。
-    *   `storageClass.name`: 自定义存储类名称。在此示例中为 `nfs-storage`。
-    *   `storageClass.defaultClass`: 是否设置为默认存储类 (`true`)。
-    *   `rbac.create`: 是否创建所需的 RBAC 权限 (`true`)。
-
-#### 使用 `install.sh` 脚本自动化安装
-
-为了简化安装过程，您可以将以下内容保存为 `install.sh` 文件，赋予执行权限 (`chmod +x install.sh`)，然后运行 (`./install.sh`)：
-
+> install.sh
 ```shell
 #!/usr/bin/env bash
 
-# 添加 nfs-subdir-external-provisioner 的 Helm 仓库
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
+
+# --- 添加仓库并更新 ---
 helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-# 更新本地 Helm 仓库列表
 helm repo update
 
-# 使用 Helm 安装 nfs-subdir-external-provisioner
-# 注意：这里的 release 名称是 nfs-subdir-external-provisioner
-helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --version 4.0.18 \
-  --namespace kube-system \
-  --create-namespace \
-  --set nfs.server=master \
-  --set nfs.path=/data/nfs/k8s \
-  --set storageClass.name=nfs-storage \
+# --- 安装 / 升级 ---
+helm upgrade --install ${RELEASE_NAME} nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+  --version ${CHART_VERSION} --namespace ${NAMESPACE} --create-namespace \
+  --set nfs.server="${NFS_SERVER}" \
+  --set nfs.path="${NFS_PATH}" \
+  --set storageClass.name="${STORAGE_CLASS_NAME}" \
   --set storageClass.defaultClass=true \
   --set rbac.create=true
-
-echo "NFS Subdir External Provisioner installation initiated."
-echo "Run 'kubectl get pods -n kube-system -l app.kubernetes.io/name=nfs-subdir-external-provisioner' to check pod status."
-echo "Run 'kubectl get storageclass' to check the StorageClass."
 ```
 
-### 验证安装与 StorageClass
+**脚本解析:**
 
-安装完成后，您可以检查 `nfs-storage` StorageClass 是否已成功创建并被标记为默认。
+1.  `#!/usr/bin/env bash`: 指定脚本使用bash解释器。
+2.  **加载变量**:
+    *   检查 `.env` 文件是否存在。
+    *   `export $(grep -v '^#' .env | sed 's/\r$//' | xargs)`: 读取 `.env` 文件（排除注释行和处理Windows换行符），并将定义的变量导出为环境变量，供后续的 `helm` 命令使用。
+3.  **添加仓库并更新**:
+    *   `helm repo add ...`: 添加 `nfs-subdir-external-provisioner` 的官方Helm Chart仓库。
+    *   `helm repo update`: 更新本地Helm仓库缓存。
+4.  **安装 / 升级**:
+    *   `helm upgrade --install ...`: 如果release已存在则升级，否则安装。
+    *   `${RELEASE_NAME}`, `${CHART_VERSION}`, `${NAMESPACE}`, `--create-namespace`: 使用环境变量和指定选项。
+    *   `--set nfs.server="${NFS_SERVER}"`: 将 `.env` 中的 `NFS_SERVER` 值传递给Chart。
+    *   `--set nfs.path="${NFS_PATH}"`: 将 `.env` 中的 `NFS_PATH` 值传递给Chart。
+    *   `--set storageClass.name="${STORAGE_CLASS_NAME}"`: 设置创建的StorageClass的名称。
+    *   `--set storageClass.defaultClass=true`: 将此NFS StorageClass设置为集群的默认StorageClass。
+    *   `--set rbac.create=true`: 自动创建所需的RBAC资源。
 
-手动检查命令：
-```bash
-kubectl get storageclass
-```
-您应该能看到类似如下的输出，其中 `nfs-storage` 带有 `(default)` 标记：
-```
-NAME                   PROVISIONER                                                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
-nfs-storage (default)  cluster.local/nfs-subdir-external-provisioner-nfs-subdir...  Delete          Immediate           true                   2m
-local-path             rancher.io/local-path                                      Delete          WaitForFirstConsumer   false                  10d
-```
-*(PROVISIONER 名称可能会因 chart 版本和 release 名称而略有不同，关键是 `nfs-storage` 存在且为 `(default)`)*
+## 4. 执行安装
 
-#### 使用 `status.sh` 脚本验证
-
-您也可以将以下内容保存为 `status.sh` 文件，赋予执行权限 (`chmod +x status.sh`)，然后运行 (`./status.sh`) 快速检查 `nfs-storage` StorageClass 的状态：
-
-```shell
-#!/usr/bin/env bash
-
-# 获取 StorageClass 列表并筛选出 nfs-storage
-kubectl get storageclass | grep nfs-storage
-```
-
-### 设置默认 StorageClass 注意事项 (新版)
-
-当您通过 Helm 安装 `nfs-subdir-external-provisioner` 并使用 `--set storageClass.defaultClass=true` 将您创建的 `nfs-storage` 设置为默认 StorageClass 时，必须确保 Kubernetes 集群中这是**唯一**被标记为默认的 StorageClass。否则，PVC 在尝试动态绑定时可能会遇到冲突或选择非预期的 StorageClass。
-
-**处理 K3s 自带的 `local-path` StorageClass：**
-
-K3s 为了提供开箱即用的本地存储解决方案，会默认安装 `local-path-provisioner`，它会自动创建一个名为 `local-path` 的 StorageClass，并且这个 `local-path` 通常也会被设置为默认。
-
-如果您仅执行 `kubectl delete storageclass local-path`，K3s 在后续的某些操作中（如重启服务或内部组件同步）可能会检测到这个它认为的 "核心组件" 丢失并重新创建它。为了彻底阻止 K3s 自动创建 `local-path` StorageClass，并确保您的 `nfs-storage` 是唯一的默认 StorageClass，请遵循以下步骤：
-
-1.  **禁用 K3s 的 `local-storage` 组件：**
-    这是最关键的一步，可以从根本上阻止 K3s 创建 `local-path`。您需要修改 K3s 的 systemd 服务单元文件。
-    打开 K3s 服务文件 (通常是 `/etc/systemd/system/k3s.service`):
-    ```bash
-    sudo vim /etc/systemd/system/k3s.service
+1.  确保您的 `.env` 文件已根据实际情况配置完毕。
+2.  赋予 `install.sh` 执行权限并运行：
+    ```shell
+    chmod +x install.sh
+    bash install.sh
     ```
-    找到 `ExecStart` 行，并在 `k3s server` 命令后添加 `--disable local-storage` 参数。例如：
-    ```diff
+
+## 5. 处理默认StorageClass (K3s等环境可选)
+
+在某些Kubernetes发行版（如K3s）中，可能预装了 `local-path` 作为默认的StorageClass。如果我们希望我们创建的 `nfs` StorageClass成为唯一的默认StorageClass，需要进行以下额外步骤：
+
+1.  **取消 `local-path` 存储类的默认值设置:**
+    ```shell
+    kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+    ```
+    这条命令会移除 `local-path` 的默认标记。
+
+2.  **卸载 `local-path` 存储类 (可选):**
+    如果您不再需要 `local-path`，可以将其删除：
+    ```shell
+    kubectl delete storageclass local-path
+    ```
+
+3.  **禁用K3s的 `local-path` 组件 (K3s特定):**
+    如果您的集群是K3s，并且希望彻底禁用 `local-path` provisioner，可以修改K3s服务配置：
+    编辑K3s服务文件（通常在Master节点）：
+    ```shell
+    # sudo vim /etc/systemd/system/k3s.service
+    ```
+    在 `ExecStart` 参数的末尾（`server` 或 `agent` 命令之后）添加 `--disable local-storage` 选项，例如：
+    ```
     ExecStart=/usr/local/bin/k3s \
         server \
-    +   --disable local-storage \
-        --some-other-existing-options
+        # ... 其他参数 ...
+        --disable local-storage
     ```
-    保存文件后，重新加载 systemd 配置并重启 K3s 服务：
-    ```bash
+    然后重新加载 `systemd` 配置并重启K3s服务：
+    ```shell
     sudo systemctl daemon-reload
     sudo systemctl restart k3s
     ```
 
-2.  **清理现有的 `local-path` StorageClass (如果K3s重启后仍然存在)：**
-    在 K3s 重启并禁用了 `local-storage` 组件后，它应该不会再主动创建 `local-path`。但如果之前它已经存在，或者在您操作期间被短暂重建，您可能需要手动清理它。
-*   首先，如果 `local-path` 仍然存在并且是默认的，先取消其默认标记（这一步在禁用组件后可能不再严格必要，但作为保险措施是好的）：
-    ```bash
-    kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-    ```
-*   然后，删除 `local-path` StorageClass：
-    ```bash
-    kubectl delete storageclass local-path
-    ```
+## 6. 初步验证
 
-3.  **验证 StorageClass 配置：**
-    执行以下命令查看当前的 StorageClass 状态：
-    ```bash
-    kubectl get storageclass
-    ```
-    您应该能看到 `nfs-storage` 是唯一带有 `(default)` 标识的存储类，并且 `local-path` 不再存在或至少不再是默认。
+为了快速检查StorageClass的配置情况，我们准备一个简单的状态检查脚本。
 
-通过以上步骤，您可以确保：
-
-*   K3s 不会再自动创建或恢复 `local-path` StorageClass。
-*   您通过 Helm 安装的 `nfs-storage` 成为集群中唯一的默认 StorageClass。
-*   新建的 PersistentVolumeClaim (PVC) 如果没有显式指定 `storageClassName`，将会默认使用 `nfs-storage` 进行动态供给。
-*   避免了因多个默认 StorageClass 导致的潜在冲突和 PVC 绑定问题。
-
-## 创建与使用 PersistentVolumeClaim
-
-### 编写 PVC 资源配置
-
-以下示例定义一个名为 `pvc-test` 的 PVC，使用前面创建的 `nfs-storage` 存储类：
-
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-test
-spec:
-  storageClassName: "nfs-storage" # 确保这里是 nfs-storage
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 10Mi
-```
-
-保存为 `pvc-test.yaml`。
-
-### 创建 PVC
-
-```bash
-kubectl apply -f pvc-test.yaml
-```
-
-### 查看 PVC 状态
-
-通过命令查看 PVC 状态：
-
-```bash
-kubectl get pvc pvc-test
-```
-
-理想状态为 `Bound`，表示 PVC 已成功绑定底层 PV。
-
-### 常见错误及处理
-
-- 若出现 `Pending` 状态，说明没有合适的 PV，或者 StorageClass 配置有问题（例如 provisioner pod 未运行，NFS 服务器无法访问等）。检查 `nfs-subdir-external-provisioner` 的 pod 日志 (`kubectl logs -n kube-system -l app.kubernetes.io/name=nfs-subdir-external-provisioner`)。
-- 若日志显示 `permission denied`，请确认 NFS 共享目录权限，推荐使用：
-
-  ```bash
-  sudo chmod 777 -R /data/nfs/k8s
-  sudo chown nfsnobody:nfsnobody -R /data/nfs/k8s # 有时也需要调整属主
-  ```
-
-  此权限设置使 Kubernetes 集群中运行的 Pod 能顺利访问 NFS 目录。`no_root_squash` 在 `/etc/exports` 中通常允许 root 写入，但 Pod 内的用户可能不是 root。
-
-### 检查 NFS 服务器存储目录
-
-NFS 服务器 `/data/nfs/k8s` 目录将会自动创建对应 PVC 的存储文件夹，文件夹名称格式通常为：
-
-```
-<namespace>-<pvc名称>-<pv名称的一部分>
-```
-例如： `default-pvc-test-pvc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-
-在 PVC 删除后，根据 `ReclaimPolicy`（`nfs-subdir-external-provisioner` 默认为 `Delete`），目录及其内容通常会被删除。如果希望保留，可以将 `ReclaimPolicy` 修改为 `Retain`，此时删除 PVC 后，PV 会进入 `Released` 状态，数据保留在 NFS 上，但目录可能会被 provisioner 重命名为带有 `archived` 前缀的目录（如 `archived-<namespace>-<pvc名称>-<pv名称的一部分>`），方便数据保留和备份。
-
-## 使用 PVC 挂载到 Pod 中
-
-以下是一个示例 Deployment 配置，展示如何将创建的 PVC 挂载到 Pod 中：
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx
-  # namespace: mldong-test # 如果需要在特定命名空间，请取消注释并确保PVC也在该命名空间或可被访问
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 80
-          volumeMounts:
-            - name: nginx-pvc
-              mountPath: /usr/share/nginx/html
-      volumes:
-        - name: nginx-pvc
-          persistentVolumeClaim:
-            claimName: pvc-test # PVC名称
-```
-
-部署后，Pod 会使用指定 PVC 挂载对应的 NFS 存储，数据实现持久化。
-
-## 资源卸载
-
-### 删除 PVC
-
-如果不再需要某个 PVC，可以先删除使用该 PVC 的 Pod，然后删除 PVC 定义。例如，删除上面示例中创建的 `pvc-test`：
-(假设 `pvc-test.yaml` 是之前创建 PVC 的文件)
-
-```bash
-kubectl delete deployment nginx # 如果部署了上面的nginx示例
-kubectl delete -f pvc-test.yaml
-```
-
-### 卸载 nfs-subdir-external-provisioner
-
-若不再需要 `nfs-subdir-external-provisioner` 服务，可以通过 Helm 将其卸载。
-以下命令将卸载之前通过 Helm 安装的、名为 `nfs-subdir-external-provisioner` 的 release，该 release 部署在 `kube-system` 命名空间中。
-
-手动卸载命令：
-```bash
-helm uninstall nfs-subdir-external-provisioner -n kube-system
-```
-
-#### 使用 `uninstall.sh` 脚本自动化卸载
-
-您也可以将以下内容保存为 `uninstall.sh` 文件，赋予执行权限 (`chmod +x uninstall.sh`)，然后运行 (`./uninstall.sh`) 来简化卸载过程：
-
+> status.sh
 ```shell
 #!/usr/bin/env bash
 
-# 使用 Helm 卸载 nfs-subdir-external-provisioner
-# 假设 release 名称为 nfs-subdir-external-provisioner (与 install.sh 中使用的名称一致)
-# 且位于 kube-system 命名空间
-helm uninstall nfs-subdir-external-provisioner -n kube-system
-
-echo "NFS Subdir External Provisioner uninstallation initiated."
-echo "You may also want to remove the Helm repository if no longer needed:"
-echo "helm repo remove nfs-subdir-external-provisioner"
-# 并且手动清理 StorageClass (如果helm uninstall 未自动删除)
-# kubectl delete storageclass nfs-storage
+# 获取 StorageClass 列表
+kubectl get storageclass
 ```
-卸载 Helm release 会移除相关的 Deployment、ServiceAccount、RBAC 规则。StorageClass `nfs-storage` 通常也会被一并删除，但最好检查一下。NFS 服务器上的数据目录不会被自动删除，需要您根据需求手动清理。
 
-### 卸载 nfs-client-provisioner (旧版)
+**脚本解析:**
+*   `kubectl get storageclass`: 该命令会列出集群中所有已配置的StorageClass。
 
-若不再使用旧版 `nfs-client-provisioner`，也可以通过 Helm 删除：
-
-```bash
-helm uninstall nfs-storage -n kube-system # 假设release名为nfs-storage
+执行脚本：
+```shell
+bash status.sh
 ```
+您应该能看到名为 `nfs` (或您在 `.env` 中定义的 `STORAGE_CLASS_NAME`) 的StorageClass，并且其 `PROVISIONER` 应能反映 `nfs-subdir-external-provisioner`，`IS-DEFAULT-CLASS` 应该为 `true` (如果成功设为默认)。
+
+## 7. 进阶验证：创建PVC测试
+
+最可靠的验证方法是实际创建一个PVC，并观察其是否能成功绑定到由 `nfs-subdir-external-provisioner` 动态创建的PV。
+
+1.  **编写测试PVC资源配置 (`pvc-test.yaml`)**
+
+    > pvc-test.yaml
+    ```yaml
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: pvc-test
+    spec:
+      storageClassName: "nfs" # 存储类名称，应与.env中STORAGE_CLASS_NAME一致
+      accessModes:
+        - ReadWriteMany # NFS支持多种访问模式，RWM是常用的一种
+      resources:
+        requests:
+          storage: 10Mi # 请求10Mi的存储空间
+    ```
+
+2.  **创建测试PVC**
+    ```shell
+    kubectl apply -f pvc-test.yaml
+    ```
+
+3.  **查看测试PVC状态**
+    ```shell
+    kubectl get pvc pvc-test
+    ```
+    输出示例：
+    ```
+    NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+    pvc-test   Bound    pvc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx   10Mi       RWM            nfs            5s
+    ```
+    如果 `STATUS` 显示为 `Bound`，表示PVC已成功创建并绑定到底层PV。您也可以通过 `kubectl get pv` 查看动态创建的PV，并到NFS服务器的 `${NFS_PATH}`（即您在 `.env` 中配置的路径，例如 `/data/nfs/k8s`）目录下检查是否有名为 `NAMESPACE-pvc-test-pvc-ID` 格式的子目录被创建。
+
+## 8. 更新应用
+
+如果需要更改 `nfs-subdir-external-provisioner` 的配置：
+
+1.  修改 `.env` 文件中对应的变量值，或者直接修改 `install.sh` 文件中 `helm upgrade` 命令的 `--set` 参数。
+2.  重新执行安装脚本：
+    ```shell
+    bash install.sh
+    ```
+    `helm upgrade --install` 命令会自动处理更新逻辑。
+
+## 9. 卸载应用
+
+如果不再需要 `nfs-subdir-external-provisioner`，可以使用以下脚本进行卸载。
+
+> uninstall.sh
+```shell
+#!/usr/bin/env bash
+
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
+
+helm uninstall ${RELEASE_NAME} -n ${NAMESPACE}
+```
+
+**脚本解析:**
+
+1.  **加载变量**: 与 `install.sh` 类似，加载 `.env` 文件中的环境变量。
+2.  `helm uninstall ${RELEASE_NAME} -n ${NAMESPACE}`: 卸载指定的Helm release。
+
+执行卸载脚本：
+```shell
+bash uninstall.sh
+```
+**注意**: 卸载 `nfs-subdir-external-provisioner` 只会删除其部署的Kubernetes资源。**它不会删除已经通过它动态创建的PV以及这些PV在NFS服务器上对应的子目录和数据。** 如果您也想删除这些数据，需要手动清理NFS服务器上的目录和集群中的PV/PVC对象。
 
 ## 总结
 
-通过上述步骤，您能够在 Kubernetes 集群中使用 Helm 快速部署 `nfs-subdir-external-provisioner`（或旧版的 `nfs-client-provisioner`），实现动态、共享的持久化存储。需要特别注意的是，NFS
-服务器端除了安装 `nfs-utils`，还必须安装并启动 `rpcbind` 服务，否则 NFS 服务无法正常工作。此方案适合多节点访问共享文件系统场景。后续若有更复杂
-NFS 存储策略管理或权限控制，需要结合具体业务需求做进一步配置和优化。
+通过本文的指南，您已经学会了如何准备NFS环境（包括客户端安装和服务端搭建），并使用Helm在Kubernetes集群中部署和配置 `nfs-subdir-external-provisioner`，以实现基于NFS的动态存储卷供应。这为您的有状态应用提供了灵活可靠的持久化存储方案。确保按照您的实际环境调整 `.env` 文件，并根据需要执行特定Kubernetes发行版（如K3s）的额外步骤。
 
-本文提供了部署的基础思路及示例配置，建议优先采用新版的 `nfs-subdir-external-provisioner`。希望对 Kubernetes 持久化存储实践有所帮助。欢迎在实际环境里根据自己的需求进行扩展和深入学习。
+---
