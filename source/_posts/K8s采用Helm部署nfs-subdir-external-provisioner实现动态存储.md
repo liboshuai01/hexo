@@ -4,6 +4,8 @@ tags:
   - Linux
   - K8s
   - Helm
+  - Nfs
+  - StorageClass
 categories:
   - 容器化
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425104445050.png'
