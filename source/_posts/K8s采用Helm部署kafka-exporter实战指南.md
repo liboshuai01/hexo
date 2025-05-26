@@ -241,6 +241,12 @@ curl http://my-kafka-exporter-prometheus-kafka-exporter.kafka.svc.cluster.local:
 *   **检查 Prometheus Targets**:
     登录到您的 Prometheus UI，导航到 "Status" -> "Targets"。您应该能在列表中找到一个指向 `kafka-exporter` 的 target，并且其状态为 `UP`。如果未找到或状态为 `DOWN`，请检查 `ServiceMonitor` 的配置、标签以及 Prometheus Operator 的日志。
 
+### 3. 导入 Grafana 面板
+
+> 注意：必须先使用非控制台生产者、消费者进行生产和消费数据，否则grafana面板会无数据。
+
+在 Prometheus UI 中，您可以导入 `kafka-exporter` 的 Grafana 面板，面板ID为`7589`，查看面板是否正常显示数据。
+
 ## 更新应用
 
 如果您需要修改 `kafka-exporter` 的配置（例如，更新 Kafka broker 地址、调整资源限制或升级 chart 版本）：
