@@ -85,7 +85,7 @@ STORAGE_CLASS_NAME="nfs"
 
 # --- 加载变量 ---
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
 else
     echo "错误: .env 文件不存在!"
     exit 1
@@ -170,7 +170,7 @@ bash install.sh
 
 # --- 加载变量 ---
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
 else
     echo "错误: .env 文件不存在!"
     exit 1
@@ -303,7 +303,7 @@ bash status.sh
 
 # --- 加载变量 ---
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
 else
     echo "错误: .env 文件不存在!"
     exit 1

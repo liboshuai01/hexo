@@ -87,7 +87,7 @@ CHART_VERSION="4.12.2"
 
 # --- 加载变量 ---
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
 else
     echo "错误: .env 文件不存在!"
     exit 1
@@ -154,7 +154,7 @@ kubectl label node k8s-node-1 ingress=true --overwrite
 
 # --- 加载变量 ---
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
 else
     echo "错误: .env 文件不存在!"
     exit 1
@@ -245,7 +245,7 @@ helm uninstall nginx-test-app -n default
 
 # --- 加载变量 ---
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
 else
     echo "错误: .env 文件不存在!"
     exit 1
