@@ -19,6 +19,8 @@ Apache Kafka 是一个高性能、分布式的发布-订阅消息系统，广泛
 
 <!-- more -->
 
+> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook/tree/master/kafka-cluster), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/kafka-cluster)
+
 ## 前提准备
 
 在开始之前，请确保您已具备以下条件：
