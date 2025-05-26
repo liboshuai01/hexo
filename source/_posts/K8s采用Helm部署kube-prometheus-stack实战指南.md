@@ -9,72 +9,78 @@ tags:
   - Alertmanager
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505241803479.png'
+cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505262315857.png'
 toc: true
 abbrlink: 9958a6cd
 date: 2025-05-24 18:01:30
 ---
 
-在Kubernetes (K8s) 生态中，监控是确保应用稳定性和性能的关键一环。`kube-prometheus-stack` 集合了 Prometheus、Grafana、Alertmanager 以及众多 Exporter，提供了一套全面且强大的云原生监控解决方案。通过 Helm，我们可以极大地简化其部署和管理过程。本文将详细介绍如何使用 Helm 在 K8s 集群中部署 `kube-prometheus-stack`。
+Kubernetes (K8s) 已成为容器编排的事实标准，而监控则是确保其上运行的应用和服务稳定可靠的关键。`kube-prometheus-stack` 是一个非常受欢迎的 Helm Chart，它打包了 Prometheus Operator、Prometheus、Grafana、Alertmanager 以及众多 Exporter，为 Kubernetes 集群提供了一套全面的监控和告警解决方案。
 
-**为什么选择 kube-prometheus-stack?**
-
-*   **一站式解决方案**: 集成了 Prometheus (指标收集与存储)、Alertmanager (告警处理)、Grafana (数据可视化) 以及常用的 K8s 监控组件。
-*   **社区活跃**: 由 Prometheus 社区维护，更新及时，文档丰富。
-*   **高度可配置**: 通过 Helm values 文件可以灵活定制各个组件。
-*   **CRD驱动**: 利用 Prometheus Operator 的 CRD (如 `ServiceMonitor`, `PodMonitor`) 自动发现和配置监控目标。
+本文将指导您如何使用 Helm，通过预配置的脚本在 Kubernetes 集群中快速部署 `kube-prometheus-stack`。
 
 <!-- more -->
 
-### 前提条件
+> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook/tree/master/kube-prometheus-stack), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/kube-prometheus-stack)
 
-在开始之前，请确保您已具备以下环境和工具：
+## 前提准备
 
-1.  **可用的 Kubernetes 集群**: 并且 `kubectl` 已配置好对集群的访问权限。
-2.  **Helm v3**: Helm 是 Kubernetes 的包管理器，如果尚未安装，请参考 [Helm 官方文档](https://helm.sh/docs/intro/install/)进行安装。
-3.  **StorageClass**: 集群中需要一个可用的 StorageClass 用于持久化存储 Prometheus、Alertmanager 和 Grafana 的数据。本指南使用名为 `nfs-storage` 的 StorageClass，请根据您的实际情况修改。
-4.  **Ingress Controller**: 集群中需要安装并配置好 Ingress Controller (如 Nginx Ingress Controller) 以便通过域名访问监控组件。本指南使用名为 `nginx` 的 Ingress Class，请根据您的实际情况修改。
-5.  **DNS 配置**: 确保您计划用于访问 Alertmanager, Prometheus, Grafana 的域名能够解析到您的 Ingress Controller 的外部 IP 地址。
+在开始之前，请确保您已满足以下条件：
 
-### 步骤 1: 准备安装脚本与配置
+1.  **拥有一个 Kubernetes 集群**：并且 `kubectl` 已配置好，可以与集群通信。
+2.  **安装了 Helm v3**：Helm 是 Kubernetes 的包管理器，我们将用它来部署 `kube-prometheus-stack`。
+3.  **配置了 Ingress Controller**：例如 Nginx Ingress Controller，因为我们将通过 Ingress 暴露 Prometheus、Grafana 和 Alertmanager 服务。脚本中会使用 `INGRESS_CLASS_NAME` 指定 Ingress 类。
+4.  **配置了 StorageClass**：Prometheus、Grafana 和 Alertmanager 都需要持久化存储。脚本中会使用 `STORAGE_CLASS_NAME` 指定存储类，例如 `nfs`、`cephfs` 或云提供商的块存储。
 
-我们将使用一个 `install.sh` 脚本来自动化部署过程。首先，创建 `install.sh` 文件：
+## 1. 配置环境变量
+
+首先，我们需要定义一些环境变量，这些变量将用于自定义 `kube-prometheus-stack` 的安装。创建一个名为 `.env` 的文件，并填入以下内容。您可以根据您的实际环境修改这些值。
+
+```env
+# 命名空间
+NAMESPACE="monitoring"
+# helm的release名称
+RELEASE_NAME="kube-prom-stack"
+# helm的chart版本
+CHART_VERSION="72.6.2"
+# 存储类名称
+STORAGE_CLASS_NAME="nfs"
+# ingress的class名称
+INGRESS_CLASS_NAME="nginx"
+# prometheus的域名
+PROMETHEUS_HOST="prometheus.lbs.com"
+# grafana的域名
+GRAFANA_HOST="grafana.lbs.com"
+# alertmanager的域名
+ALERTMANAGER_HOST="alertmanager.lbs.com"
+# grafana的admin用户密码
+GRAFANA_ADMIN_PASSWORD="YOUR_PASSWORD"
+```
+
+**重要提示**：请务必将 `GRAFANA_ADMIN_PASSWORD` 的值 `"YOUR_PASSWORD"` 替换为您自己的强密码。
+
+## 2. 编写安装脚本
+
+接下来，我们创建一个安装脚本 `install.sh`。该脚本会加载 `.env` 文件中的变量，添加 Prometheus Helm 仓库，并使用 `helm upgrade --install` 命令来部署或更新 `kube-prometheus-stack`。
 
 ```shell
 #!/usr/bin/env bash
 
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
+
+# --- 添加仓库并更新 ---
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-# --- 配置变量 ---
-# Helm 安装相关
-RELEASE_NAME="kube-prom-stack"
-CHART_VERSION="72.6.2" # 请确认这是您希望使用的稳定版本，或注释掉以使用最新版
-NAMESPACE="monitoring"
-
-# 存储类和Ingress类
-STORAGE_CLASS_NAME="nfs-storage" # 根据您的环境修改
-INGRESS_CLASS_NAME="nginx"      # 确保您的集群中已安装并配置了Nginx Ingress Controller
-
-# Ingress 主机名 (请根据您的环境修改这些占位符)
-# 确保这些域名可以解析到您的 Ingress Controller 的外部 IP
-ALERTMANAGER_HOST="alertmanager.yourdomain.com" # 例如: alertmanager.k8s.example.com
-PROMETHEUS_HOST="prometheus.yourdomain.com"   # 例如: prometheus.k8s.example.com
-GRAFANA_HOST="grafana.yourdomain.com"       # 例如: grafana.k8s.example.com
-
-# 持久化存储大小
-ALERTMANAGER_STORAGE_SIZE="8Gi"
-PROMETHEUS_STORAGE_SIZE="32Gi" # Prometheus 需要的存储通常比 Alertmanager 和 Grafana 多
-GRAFANA_STORAGE_SIZE="8Gi"
-
-# Grafana 管理员密码 (生产环境建议修改或使用 Secret)
-GRAFANA_ADMIN_PASSWORD="YourSecurePassword" # 这是 chart 的默认密码是 'prom-operator', 请务必修改
-
-# --- 安装 kube-prometheus-stack ---
-helm install ${RELEASE_NAME} prometheus-community/kube-prometheus-stack \
-  --version ${CHART_VERSION} \
-  --namespace ${NAMESPACE} \
-  --create-namespace \
+# --- 安装 / 升级 ---
+helm upgrade --install ${RELEASE_NAME} prometheus-community/kube-prometheus-stack \
+  --version ${CHART_VERSION} --namespace ${NAMESPACE} --create-namespace \
   \
   --set alertmanager.enabled=true \
   --set alertmanager.ingress.enabled=true \
@@ -83,7 +89,7 @@ helm install ${RELEASE_NAME} prometheus-community/kube-prometheus-stack \
   --set alertmanager.ingress.paths[0]="/" \
   --set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.storageClassName=${STORAGE_CLASS_NAME} \
   --set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.accessModes[0]="ReadWriteOnce" \
-  --set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.resources.requests.storage=${ALERTMANAGER_STORAGE_SIZE} \
+  --set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.resources.requests.storage=8Gi \
   \
   --set prometheus.enabled=true \
   --set prometheus.ingress.enabled=true \
@@ -92,7 +98,7 @@ helm install ${RELEASE_NAME} prometheus-community/kube-prometheus-stack \
   --set prometheus.ingress.paths[0]="/" \
   --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=${STORAGE_CLASS_NAME} \
   --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.accessModes[0]="ReadWriteOnce" \
-  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=${PROMETHEUS_STORAGE_SIZE} \
+  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=32Gi \
   \
   --set grafana.enabled=true \
   --set grafana.adminPassword=${GRAFANA_ADMIN_PASSWORD} \
@@ -103,163 +109,215 @@ helm install ${RELEASE_NAME} prometheus-community/kube-prometheus-stack \
   --set grafana.persistence.enabled=true \
   --set grafana.persistence.storageClassName=${STORAGE_CLASS_NAME} \
   --set grafana.persistence.accessModes[0]="ReadWriteOnce" \
-  --set grafana.persistence.size=${GRAFANA_STORAGE_SIZE} \
+  --set grafana.persistence.size=8Gi \
   \
   --set prometheusOperator.enabled=true
-
-echo ""
-echo "kube-prometheus-stack (${RELEASE_NAME}) 安装过程已启动到命名空间 '${NAMESPACE}'。"
-echo "---------------------------------------------------------------------"
-echo "监控 Pod 状态: kubectl get pods -n ${NAMESPACE} -w"
-echo ""
-echo "访问服务 (请确保您的 DNS 配置正确或使用 Ingress Controller 的外部 IP):"
-echo "  Alertmanager: http://${ALERTMANAGER_HOST}"
-echo "  Prometheus:   http://${PROMETHEUS_HOST}"
-echo "  Grafana:      http://${GRAFANA_HOST}"
-echo "                (默认用户: admin, 密码: ${GRAFANA_ADMIN_PASSWORD})"
-echo "---------------------------------------------------------------------"
-echo "如果遇到问题, 使用 'helm status ${RELEASE_NAME} -n ${NAMESPACE}' 和 'kubectl logs -n ${NAMESPACE} -l app.kubernetes.io/name=prometheus-operator -c prometheus-operator' 进行排查。"
 ```
 
-**重要配置说明:**
+**脚本内容解析：**
 
-*   **`CHART_VERSION`**: 建议指定一个明确的、经过测试的稳定版本号。如果注释掉 `--version` 参数，Helm 会尝试安装最新版本。
-*   **`NAMESPACE`**: 指定安装 `kube-prometheus-stack` 的命名空间，脚本中会使用 `--create-namespace` 自动创建。
-*   **`STORAGE_CLASS_NAME`**: **务必修改**为您集群中实际可用的 StorageClass 名称。
-*   **`INGRESS_CLASS_NAME`**: **务必修改**为您集群中 Ingress Controller 使用的 IngressClass 名称。
-*   **`ALERTMANAGER_HOST`, `PROMETHEUS_HOST`, `GRAFANA_HOST`**: **务必修改**为您规划的域名，并确保这些域名已正确配置 DNS 解析。
-*   **`GRAFANA_ADMIN_PASSWORD`**: **务必修改**为您自定义的安全密码。生产环境中更推荐使用 Kubernetes Secret 来管理敏感信息，或者在首次登录后立即修改。
-
-### 步骤 2: 执行安装
-
-1.  **赋予脚本执行权限**:
-    ```bash
-    chmod +x install.sh
-    ```
-
-2.  **运行安装脚本**:
-    ```bash
-    ./install.sh
-    ```
-
-脚本会首先添加 Prometheus 社区的 Helm 仓库并更新，然后根据配置变量执行 `helm install` 命令。
-
-### 步骤 3: 验证安装状态
-
-安装过程可能需要几分钟，等待所有 Pod 启动并运行。
-
-1.  **监控 Pod 状态** (如脚本末尾提示):
-    ```bash
-    kubectl get pods -n monitoring -w
-    ```
-    等待所有 Pod 状态变为 `Running` 且 `READY` 列的容器数量正确 (例如 `1/1`, `2/2`)。
-
-2.  **查看所有资源和持久化卷声明 (PVC)**:
-    为了方便检查，我们创建一个 `status.sh` 脚本：
+1.  **`#!/usr/bin/env bash`**: Shebang，指定脚本使用 bash解释器执行。
+2.  **加载变量**:
     ```shell
-    #!/usr/bin/env bash
-
-    kubectl get all -n monitoring
-    kubectl get pvc -n monitoring
+    if [ -f .env ]; then
+        export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
+    else
+        echo "错误: .env 文件不存在!"
+        exit 1
+    fi
     ```
-    赋予执行权限并运行：
-    ```bash
-    chmod +x status.sh
-    ./status.sh
+    *   这部分代码检查当前目录下是否存在 `.env` 文件。
+    *   如果存在，`grep -v '^#' .env` 会读取文件内容，并排除以 `#` 开头的注释行。
+    *   `sed 's/\r$//'` 用于移除 Windows 风格的换行符 `\r` (如果存在)，确保跨平台兼容性。
+    *   `xargs` 将处理后的每行内容（`KEY=VALUE` 格式）作为参数传递给 `export` 命令，从而将这些键值对设置为环境变量。
+    *   如果 `.env` 文件不存在，则打印错误信息并退出脚本。
+3.  **添加仓库并更新**:
+    ```shell
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo update
     ```
-    您应该能看到相关的 Service, Deployment, StatefulSet, PVC 等资源。特别注意 PVC 的状态是否为 `Bound`。
+    *   `helm repo add prometheus-community ...`: 添加 `prometheus-community` 的 Helm Chart 仓库。这是 `kube-prometheus-stack` Chart 的官方来源。
+    *   `helm repo update`: 更新本地 Helm 仓库列表，确保能获取到最新的 Chart 信息。
+4.  **安装 / 升级**:
+    ```shell
+    helm upgrade --install ${RELEASE_NAME} prometheus-community/kube-prometheus-stack \
+      --version ${CHART_VERSION} --namespace ${NAMESPACE} --create-namespace \
+      ... (省略了 --set 参数)
+    ```
+    *   `helm upgrade --install`: 这是 Helm 的核心命令。
+        *   `upgrade`: 如果指定的 `RELEASE_NAME` 已经存在，则升级该 Release。
+        *   `--install`: 如果指定的 `RELEASE_NAME` 不存在，则安装它。这个组合使得脚本具有幂等性，可以反复执行。
+    *   `${RELEASE_NAME}`: Helm Release 的名称，从 `.env` 文件中加载。
+    *   `prometheus-community/kube-prometheus-stack`: 要安装的 Chart 名称，格式为 `<repository_name>/<chart_name>`。
+    *   `--version ${CHART_VERSION}`: 指定要安装的 Chart 版本，从 `.env` 文件中加载。
+    *   `--namespace ${NAMESPACE}`: 指定 Release 安装到的 Kubernetes 命名空间，从 `.env` 文件中加载。
+    *   `--create-namespace`: 如果指定的命名空间不存在，则自动创建它。
+5.  **`--set` 参数**:
+    这些参数用于覆盖 Chart 中的默认 `values.yaml` 配置。
+    *   **Alertmanager 配置**:
+        *   `--set alertmanager.enabled=true`: 启用 Alertmanager 组件。
+        *   `--set alertmanager.ingress.enabled=true`: 为 Alertmanager 启用 Ingress 资源，使其能通过域名访问。
+        *   `--set alertmanager.ingress.ingressClassName=${INGRESS_CLASS_NAME}`: 指定 Ingress Controller 的类名。
+        *   `--set alertmanager.ingress.hosts[0]=${ALERTMANAGER_HOST}`: 设置 Alertmanager 的访问域名。
+        *   `--set alertmanager.ingress.paths[0]="/"`: 设置 Alertmanager Ingress 的访问路径。
+        *   `--set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.storageClassName=${STORAGE_CLASS_NAME}`: 指定 Alertmanager 持久化存储使用的 StorageClass。
+        *   `--set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.accessModes[0]="ReadWriteOnce"`: 设置存储卷的访问模式。
+        *   `--set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.resources.requests.storage=8Gi`: 设置 Alertmanager 的存储请求大小。
+    *   **Prometheus 配置**:
+        *   `--set prometheus.enabled=true`: 启用 Prometheus 组件。
+        *   `--set prometheus.ingress.enabled=true`: 为 Prometheus 启用 Ingress。
+        *   `--set prometheus.ingress.ingressClassName=${INGRESS_CLASS_NAME}`: 指定 Ingress Controller 的类名。
+        *   `--set prometheus.ingress.hosts[0]=${PROMETHEUS_HOST}`: 设置 Prometheus 的访问域名。
+        *   `--set prometheus.ingress.paths[0]="/"`: 设置 Prometheus Ingress 的访问路径。
+        *   `--set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=${STORAGE_CLASS_NAME}`: 指定 Prometheus 持久化存储使用的 StorageClass。
+        *   `--set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.accessModes[0]="ReadWriteOnce"`: 设置存储卷的访问模式。
+        *   `--set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=32Gi`: 设置 Prometheus 的存储请求大小。
+    *   **Grafana 配置**:
+        *   `--set grafana.enabled=true`: 启用 Grafana 组件。
+        *   `--set grafana.adminPassword=${GRAFANA_ADMIN_PASSWORD}`: 设置 Grafana 的 admin 用户密码。
+        *   `--set grafana.ingress.enabled=true`: 为 Grafana 启用 Ingress。
+        *   `--set grafana.ingress.ingressClassName=${INGRESS_CLASS_NAME}`: 指定 Ingress Controller 的类名。
+        *   `--set grafana.ingress.hosts[0]=${GRAFANA_HOST}`: 设置 Grafana 的访问域名。
+        *   `--set grafana.ingress.path="/"`: 设置 Grafana Ingress 的访问路径。
+        *   `--set grafana.persistence.enabled=true`: 启用 Grafana 的持久化存储。
+        *   `--set grafana.persistence.storageClassName=${STORAGE_CLASS_NAME}`: 指定 Grafana 持久化存储使用的 StorageClass。
+        *   `--set grafana.persistence.accessModes[0]="ReadWriteOnce"`: 设置存储卷的访问模式。
+        *   `--set grafana.persistence.size=8Gi`: 设置 Grafana 的存储请求大小。
+    *   **Prometheus Operator 配置**:
+        *   `--set prometheusOperator.enabled=true`: 启用 Prometheus Operator 组件。Prometheus Operator 负责管理 Prometheus 实例、ServiceMonitors、PodMonitors 等自定义资源。
 
-3.  **访问Web UI**:
-    在浏览器中打开您配置的域名：
-    *   **Alertmanager**: `http://alertmanager.yourdomain.com`
-    *   **Prometheus**: `http://prometheus.yourdomain.com`
-    *   **Grafana**: `http://grafana.yourdomain.com`
-        *   使用用户名 `admin` 和您在 `install.sh` 中设置的 `GRAFANA_ADMIN_PASSWORD` 密码登录。
+这个脚本通过 `--set` 参数详细配置了 Alertmanager、Prometheus 和 Grafana 的持久化存储、Ingress 规则以及 Grafana 的管理员密码，确保了监控栈的关键组件都能按需部署和访问。
 
-### 步骤 4: (可选) 自定义与扩展
+## 3. 执行安装
 
-`kube-prometheus-stack` 安装完成后，您可以进行更多自定义操作：
+确保 `.env` 和 `install.sh` 文件在同一目录下，并赋予 `install.sh` 执行权限：
 
-*   **Grafana**:
-    *   导入或创建新的 Dashboard。
-    *   配置数据源 (默认已配置好 Prometheus)。
-    *   配置用户和权限。
-*   **Prometheus**:
-    *   通过创建 `ServiceMonitor` 或 `PodMonitor` CRD 来自动发现和抓取新的应用指标。
-    *   配置告警规则 (`PrometheusRule` CRD)。
-*   **Alertmanager**:
-    *   配置告警接收器 (如 Email, Slack, Webhook) 和路由规则。
+```bash
+chmod +x install.sh
+```
 
-### 步骤 5: 卸载
+然后执行安装脚本：
 
-如果您需要卸载 `kube-prometheus-stack`，可以使用以下 `uninstall.sh` 脚本：
+```bash
+bash install.sh
+```
 
+Helm 命令会创建指定的命名空间（如果不存在），并开始部署所有相关的 Kubernetes 资源。这个过程可能需要几分钟。
+
+## 4. 配置 Hosts 解析 (或 DNS)
+
+为了能够通过域名访问 Prometheus、Grafana 和 Alertmanager，您需要在能够访问 Kubernetes Ingress Controller 的机器上配置 `/etc/hosts` 文件 (或者在您的 DNS 服务器上添加相应的 A 记录)。
+
+获取您的 Ingress Controller 服务的外部 IP 地址（通常是 LoadBalancer 类型 Service 的 EXTERNAL-IP，或者 NodePort 模式下任一集群节点的 IP）。
+
+```bash
+kubectl get svc -n <your-ingress-controller-namespace>
+```
+
+假设您的 Ingress Controller 节点 IP 是 `192.168.6.202`，并且您在 `.env` 中定义的域名是 `prometheus.lbs.com`, `grafana.lbs.com`, `alertmanager.lbs.com`。编辑您的本地 `hosts` 文件 (Linux/macOS: `/etc/hosts`, Windows: `C:\Windows\System32\drivers\etc\hosts`)，添加如下内容：
+
+```
+192.168.6.202 prometheus.lbs.com grafana.lbs.com alertmanager.lbs.com
+```
+请将 `192.168.6.202` 替换为您实际的 Ingress 节点 IP，并将域名替换为您在 `.env` 文件中定义的域名。
+
+## 5. 初步验证
+
+为了快速检查部署状态，我们可以创建一个 `status.sh` 脚本来查看相关 Pod、Service 和 PVC 的状态。
+
+创建 `status.sh` 文件：
 ```shell
 #!/usr/bin/env bash
 
-RELEASE_NAME="kube-prom-stack" # 与安装时使用的 RELEASE_NAME 一致
-NAMESPACE="monitoring"       # 与安装时使用的 NAMESPACE 一致
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
+
+kubectl get all -n ${NAMESPACE}
+kubectl get pvc -n ${NAMESPACE}
+```
+赋予执行权限并运行：
+```bash
+chmod +x status.sh
+bash status.sh
+```
+您应该能看到所有相关的 Pod 都处于 `Running` 状态，并且 PVCs 已经成功绑定。
+
+## 6. 进阶验证
+
+现在，您可以通过浏览器访问之前配置的域名来验证各个组件是否正常工作：
+
+1.  **Prometheus**: 访问 `http://prometheus.lbs.com` (替换为您的 Prometheus 域名)。您应该能看到 Prometheus UI。
+2.  **Grafana**: 访问 `http://grafana.lbs.com` (替换为您的 Grafana 域名)。使用用户名 `admin` 和您在 `.env` 文件中设置的 `GRAFANA_ADMIN_PASSWORD` 登录。
+3.  **Alertmanager**: 访问 `http://alertmanager.lbs.com` (替换为您的 Alertmanager 域名)。您应该能看到 Alertmanager UI。
+
+如果所有页面都能正常访问，那么恭喜您，`kube-prometheus-stack` 已成功部署！
+
+## 7. 更新应用
+
+如果您需要修改配置（例如，更改存储大小、更新版本号或调整任何 Helm Chart 的值），可以按以下步骤操作：
+
+1.  修改 `.env` 文件中的相关变量。
+2.  如果需要调整 `install.sh` 脚本中的 `--set` 参数，也一并修改。
+3.  重新执行安装脚本：
+    ```bash
+    bash install.sh
+    ```
+    Helm 的 `upgrade --install` 命令是幂等的，它会自动应用更改。
+
+## 8. 卸载应用
+
+如果您需要卸载 `kube-prometheus-stack`，可以创建一个 `uninstall.sh` 脚本。
+
+创建 `uninstall.sh` 文件：
+```shell
+#!/usr/bin/env bash
+
+# --- 加载变量 ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | sed 's/\r$//' | xargs)
+else
+    echo "错误: .env 文件不存在!"
+    exit 1
+fi
 
 helm uninstall ${RELEASE_NAME} -n ${NAMESPACE}
-
-echo "${RELEASE_NAME} 卸载过程已启动。"
-echo "如果 StorageClass 的 reclaimPolicy 不是 Delete，Persistent Volume Claims (PVCs) 可能需要手动删除。"
-echo "请使用以下命令检查：kubectl get pvc -n ${NAMESPACE}"
-echo "如果需要，手动删除PVC：kubectl delete pvc <pvc-name> -n ${NAMESPACE}"
-# 例如: kubectl delete pvc storage-alertmanager-kube-prom-stack-alertmanager-0 -n monitoring
-#       kubectl delete pvc prometheus-kube-prom-stack-prometheus-db-prometheus-kube-prom-stack-prometheus-0 -n monitoring
-#       kubectl delete pvc grafana-kube-prom-stack -n monitoring (这个PVC名字可能因chart版本而异，请以实际get pvc为准)
-# 如果您也想删除命名空间，可以执行：
-# kubectl delete namespace ${NAMESPACE}
 ```
 
-1.  **赋予脚本执行权限**:
-    ```bash
-    chmod +x uninstall.sh
-    ```
-2.  **运行卸载脚本**:
-    ```bash
-    ./uninstall.sh
-    ```
+赋予执行权限并运行：
+```bash
+chmod +x uninstall.sh
+bash uninstall.sh
+```
+这将卸载由 Helm Chart 创建的所有 Kubernetes 资源。
 
-**注意**:
-卸载操作默认不会删除持久化卷声明 (PVCs) 和它们对应的持久化卷 (PVs)，除非您的 StorageClass 的 `reclaimPolicy` 设置为 `Delete`。如果需要彻底清除数据，请在卸载后手动删除相关的 PVCs。您可以使用 `kubectl get pvc -n monitoring` 查看，并使用 `kubectl delete pvc <pvc-name> -n monitoring` 删除。如果命名空间也不再需要，可以执行 `kubectl delete namespace monitoring`。
+**（可选）删除 PVC**
 
-### 故障排查
+默认情况下，Helm 卸载时不会删除 PersistentVolumeClaims (PVCs)，以防止数据丢失。如果您确定不再需要这些数据，可以手动删除它们：
 
-如果在安装或运行过程中遇到问题，可以尝试以下命令进行排查：
-
-*   **查看 Helm Release 状态**:
-    ```bash
-    helm status kube-prom-stack -n monitoring
-    ```
-*   **查看 Prometheus Operator 日志**:
-    ```bash
-    kubectl logs -n monitoring -l app.kubernetes.io/name=prometheus-operator -c prometheus-operator -f
-    ```
-*   **查看特定 Pod 日志**:
-    ```bash
-    kubectl logs -n monitoring <pod-name> -c <container-name> -f
-    ```
-    例如，查看 Grafana Pod 日志：先用 `kubectl get pods -n monitoring` 找到 Grafana Pod 的名字，然后执行（假设Pod名为 `kube-prom-stack-grafana-xxxx`）：
-    ```bash
-    kubectl logs -n monitoring kube-prom-stack-grafana-xxxx -c grafana -f
-    ```
-*   **检查 Ingress 配置**:
-    ```bash
-    kubectl describe ingress -n monitoring
-    ```
-    确保 Ingress 规则已正确生成，并且 Ingress Controller 的日志没有报错。
-*   **检查 PVC 和 PV 状态**:
+1.  查看 PVC：
     ```bash
     kubectl get pvc -n monitoring
-    kubectl describe pvc <pvc-name> -n monitoring
-    kubectl get pv
     ```
-    查看 PVC 是否成功绑定到 PV，存储是否成功分配。
+    (将 `monitoring` 替换为您在 `.env` 文件中定义的 `NAMESPACE`)
 
-### 总结
+2.  删除 PVC (请将 `[pvc名称]` 替换为实际的 PVC 名称)：
+    ```bash
+    kubectl delete pvc [pvc名称] -n monitoring
+    ```
+    例如：
+    ```bash
+    kubectl delete pvc prometheus-kube-prom-stack-prometheus-db-prometheus-kube-prom-stack-prometheus-0 -n monitoring
+    kubectl delete pvc storage-kube-prom-stack-grafana -n monitoring
+    kubectl delete pvc alertmanager-kube-prom-stack-alertmanager-db-alertmanager-kube-prom-stack-alertmanager-0 -n monitoring
+    ```
 
-通过 Helm 和 `kube-prometheus-stack`，我们可以快速、便捷地在 Kubernetes 集群中部署一套功能完善的监控系统。本文提供的脚本和步骤旨在帮助您快速上手，并根据实际需求进行调整。熟悉 Prometheus、Grafana 和 Alertmanager 的配置，将使您能够更好地利用这套强大的监控工具，保障应用服务的稳定运行。
+## 总结
+
+通过本文提供的脚本和步骤，您可以轻松地在 Kubernetes 集群中部署、管理和维护 `kube-prometheus-stack`。这套监控方案为您的集群和应用提供了强大的可观测性，有助于及时发现和解决问题，保障业务的稳定运行。您可以进一步探索 Grafana 的仪表盘定制、Prometheus 的查询语言 PromQL 以及 Alertmanager 的告警规则配置，以充分发挥其监控能力。
 
 ---
