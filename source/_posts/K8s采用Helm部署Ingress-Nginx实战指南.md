@@ -18,7 +18,7 @@ date: 2025-05-06 11:20:16
 
 <!-- more -->
 
-> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook/tree/master/ingress-nginx), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/ingress-nginx)
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/ingress-nginx), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/ingress-nginx)
 
 ## Ingress-Nginx 部署模式简介
 

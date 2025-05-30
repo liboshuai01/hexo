@@ -20,7 +20,7 @@ date: 2025-05-27 01:40:21
 
 <!-- more -->
 
-> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook/tree/master/redis/redis-exporter), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/redis/redis-exporter)
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/redis/redis-exporter), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/redis/redis-exporter)
 
 ## 前提准备
 

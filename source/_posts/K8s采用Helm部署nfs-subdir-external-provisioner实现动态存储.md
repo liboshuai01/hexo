@@ -20,7 +20,7 @@ date: 2025-05-05 10:43:17
 
 <!-- more -->
 
-> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/nfs-subdir-external-provisioner)
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/nfs-subdir-external-provisioner)
 
 ## 前提条件
 

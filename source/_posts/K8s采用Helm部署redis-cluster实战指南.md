@@ -19,7 +19,7 @@ date: 2025-05-09 13:59:31
 
 <!-- more -->
 
-> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook/tree/master/redis/redis-cluster), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/redis/redis-cluster)
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/redis/redis-cluster), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/redis/redis-cluster)
 
 ## 前提准备
 

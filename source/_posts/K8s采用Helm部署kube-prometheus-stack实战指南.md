@@ -21,7 +21,7 @@ Kubernetes (K8s) 已成为容器编排的事实标准，而监控则是确保其
 
 <!-- more -->
 
-> 项目源码：[github](https://github.com/liboshuai01/k8s-cookbook/tree/master/kube-prometheus-stack), [gitee](https://gitee.com/liboshuai01/k8s-cookbook/tree/master/kube-prometheus-stack)
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/kube-prometheus-stack), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/kube-prometheus-stack)
 
 ## 前提准备
 
