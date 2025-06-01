@@ -65,9 +65,9 @@ K3s 是由 Rancher Labs（现为 SUSE 的一部分）精心打造的一款轻量
 
 | 主机名    | IP 地址 (示例) | 角色                   | CPU | 内存  |
 | :-------- | :------------- | :--------------------- | :-- | :---- |
-| `k3s-master` | `192.168.1.100` | `control-plane`, `master` | 2   | 4GB   |
-| `k3s-node1`  | `192.168.1.101` | `worker`               | 2   | 4GB   |
-| `k3s-node2`  | `192.168.1.102` | `worker`               | 2   | 4GB   |
+| `master` | `192.168.1.100` | `control-plane`, `master` | 2   | 4GB   |
+| `node1`  | `192.168.1.101` | `worker`               | 2   | 4GB   |
+| `node2`  | `192.168.1.102` | `worker`               | 2   | 4GB   |
 
 > **重要提示**：请将上述表格中的主机名和 IP 地址替换为您环境中的实际值。
 
@@ -77,7 +77,7 @@ K3s 是由 Rancher Labs（现为 SUSE 的一部分）精心打造的一款轻量
 
 ### 1. 系统预配置 (所有节点)
 
-在 `k3s-master`、`k3s-node1`、`k3s-node2` 所有节点上执行以下操作：
+在 `master`、`node1`、`node2` 所有节点上执行以下操作：
 
 #### a. 关闭防火墙（简化演示，生产环境请配置精确规则）
 
@@ -96,9 +96,9 @@ systemctl disable firewalld
 # 例如:
 # vim /etc/hosts
 
-192.168.1.100 k3s-master
-192.168.1.101 k3s-node1
-192.168.1.102 k3s-node2
+192.168.1.100 master
+192.168.1.101 node1
+192.168.1.102 node2
 ```
 
 #### c. 确保所有节点时间同步
@@ -107,7 +107,7 @@ systemctl disable firewalld
 
 ### 2. 安装 K3s Master 节点
 
-在 `k3s-master` 节点上执行以下命令安装 K3s 服务：
+在 `master` 节点上执行以下命令安装 K3s 服务：
 
 ```shell
 # 官方安装脚本
@@ -125,7 +125,7 @@ systemctl status k3s
 
 ### 3. 获取 Master 节点的 Token
 
-Master 节点安装成功后，会生成一个 Token，用于 Worker 节点加入集群。在 `k3s-master` 节点上执行以下命令查看 Token：
+Master 节点安装成功后，会生成一个 Token，用于 Worker 节点加入集群。在 `master` 节点上执行以下命令查看 Token：
 
 ```shell
 cat /var/lib/rancher/k3s/server/node-token
@@ -134,7 +134,7 @@ cat /var/lib/rancher/k3s/server/node-token
 
 ### 4. 安装 K3s Worker 节点并加入集群
 
-分别在 `k3s-node1` 和 `k3s-node2` 节点上执行以下命令。请将 `YOUR_MASTER_IP_OR_HOSTNAME` 替换为 Master 节点的实际 IP 地址或主机名 (例如 `k3s-master` 或 `192.168.1.100`)，并将 `YOUR_NODE_TOKEN` 替换为上一步获取到的 Token。
+分别在 `node1` 和 `node2` 节点上执行以下命令。请将 `YOUR_MASTER_IP_OR_HOSTNAME` 替换为 Master 节点的实际 IP 地址或主机名 (例如 `master` 或 `192.168.1.100`)，并将 `YOUR_NODE_TOKEN` 替换为上一步获取到的 Token。
 
 ```shell
 # 将 YOUR_MASTER_IP_OR_HOSTNAME 和 YOUR_NODE_TOKEN 替换为实际值
@@ -144,7 +144,7 @@ curl -sfL https://get.k3s.io | K3S_URL=https://YOUR_MASTER_IP_OR_HOSTNAME:6443 K
 # curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_URL=https://YOUR_MASTER_IP_OR_HOSTNAME:6443 K3S_TOKEN=YOUR_NODE_TOKEN sh -
 ```
 
-例如，对于 `k3s-node1`，如果 Master IP 是 `192.168.1.100`，Token 是 `K10...::server:yyy...`：
+例如，对于 `node1`，如果 Master IP 是 `192.168.1.100`，Token 是 `K10...::server:yyy...`：
 ```shell
 # 示例:
 # curl -sfL https://get.k3s.io | K3S_URL=https://192.168.1.100:6443 K3S_TOKEN=K10xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx::server:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy sh -
@@ -158,7 +158,7 @@ systemctl status k3s-agent
 
 ### 5. 验证集群状态
 
-在 `k3s-master` 节点上执行以下命令，查看集群节点状态：
+在 `master` 节点上执行以下命令，查看集群节点状态：
 
 ```shell
 kubectl get nodes -o wide
@@ -183,10 +183,10 @@ source ~/.bashrc
 
 默认情况下，Worker 节点的 `ROLES` 列可能显示为 `<none>`。您可以为它们打上 `worker` 标签，以更清晰地标识其角色：
 
-在 `k3s-master` 节点上执行：
+在 `master` 节点上执行：
 ```shell
-kubectl label node k3s-node1 node-role.kubernetes.io/worker=worker
-kubectl label node k3s-node2 node-role.kubernetes.io/worker=worker
+kubectl label node node1 node-role.kubernetes.io/worker=worker
+kubectl label node node2 node-role.kubernetes.io/worker=worker
 ```
 
 再次查看节点状态：
@@ -203,7 +203,7 @@ kubectl get nodes -o wide
 
 ### 1. 卸载 Worker 节点
 
-在每个 Worker 节点（例如 `k3s-node1`、`k3s-node2`）上执行以下命令：
+在每个 Worker 节点（例如 `node1`、`node2`）上执行以下命令：
 
 ```shell
 /usr/local/bin/k3s-agent-uninstall.sh
@@ -212,7 +212,7 @@ kubectl get nodes -o wide
 
 ### 2. 卸载 Master 节点
 
-在 Master 节点（例如 `k3s-master`）上执行以下命令：
+在 Master 节点（例如 `master`）上执行以下命令：
 
 ```shell
 /usr/local/bin/k3s-uninstall.sh
