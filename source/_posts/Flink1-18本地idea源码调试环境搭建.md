@@ -121,8 +121,10 @@ cp -r ./flink-dist/target/flink-1.18-SNAPSHOT-bin/flink-1.18-SNAPSHOT/conf/* ./c
 cp -r ./flink-dist/target/flink-1.18-SNAPSHOT-bin/flink-1.18-SNAPSHOT/lib/* ./distlib
 ```
 
-启动master（standalone集群模式）
+启动master
 ---
+
+> standalone集群模式
 
 **1. 找到启动类**
 
@@ -150,8 +152,10 @@ cp -r ./flink-dist/target/flink-1.18-SNAPSHOT-bin/flink-1.18-SNAPSHOT/lib/* ./di
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605152833245.png)
 
-启动TaskManager（standalone集群模式）
+启动TaskManager
 ---
+
+> standalone集群模式
 
 **1. 找到启动类**
 
