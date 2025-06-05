@@ -1,8 +1,8 @@
 ---
-title: CentOS7服务器一键初始化配置脚本
+title: RockyLinux服务器一键初始化配置脚本
 tags:
   - Linux
-  - Centos
+  - RockyLinux
 categories:
   - 运维手册
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504242143123.png'
@@ -11,7 +11,7 @@ abbrlink: c8df43e1
 date: 2024-03-23 21:42:31
 ---
 
-在部署全新的 CentOS 7 服务器时，系统管理员往往需要进行一系列繁琐的基础配置工作，包括设置主机名、关闭安全策略、调整系统资源限制、安装常用工具及配置 Docker 环境等。这些手动操作不仅耗时，而且容易因疏忽导致配置错误。为此，本文提供了一份一键初始化脚本，帮助您快速完成基础环境搭建，保障服务器具备稳定、高效的运行基础。
+在部署全新的 RockyLinux 服务器时，系统管理员往往需要进行一系列繁琐的基础配置工作，包括设置主机名、关闭安全策略、调整系统资源限制、安装常用工具及配置 Docker 环境等。这些手动操作不仅耗时，而且容易因疏忽导致配置错误。为此，本文提供了一份一键初始化脚本，帮助您快速完成基础环境搭建，保障服务器具备稳定、高效的运行基础。
 
 <!-- more -->
 
@@ -26,10 +26,10 @@ date: 2024-03-23 21:42:31
 
 ## 一键初始化脚本详解
 
-将以下脚本复制到 CentOS 7 服务器终端，并以 root 账户执行即可。请根据您的实际需求，调整脚本开头的变量以适配不同环境。
+将以下脚本复制到 RockyLinux 服务器终端，并以 root 账户执行即可。请根据您的实际需求，调整脚本开头的变量以适配不同环境。
 
 ```bash
-cat > init-centos.sh << "EOF" && chmod +x init-centos.sh && ./init-centos.sh
+cat > init-rockyLinux.sh << "EOF" && chmod +x init-rockyLinux.sh && ./init-rockyLinux.sh
 #!/bin/bash
 
 # 确保脚本以 root 身份执行
@@ -82,7 +82,11 @@ fi
 sysctl -p
 
 echo "安装常用基础工具包..."
-yum install -y vim git curl wget unzip zip lrzsz net-tools epel-release tree gcc automake autoconf libtool make openssl yum-utils device-mapper-persistent-data lvm2
+yum install -y vim git curl wget unzip zip lrzsz net-tools epel-release tree gcc automake autoconf libtool make openssl yum-utils device-mapper-persistent-data lvm2 chrony
+
+echo "同步时间..."
+sudo systemctl enable --now chronyd
+sudo chronyc makestep
 
 echo "配置并安装 Docker CE..."
 yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
@@ -144,6 +148,6 @@ EOF
 
 ## 总结
 
-通过执行这份自动化初始化脚本，您可以快速搭建一套既合规又高效的 CentOS 7 基础服务器环境，省去重复配置时间，并减少人为操作失误风险。欢迎根据自身环境对脚本进行个性化定制，打造符合团队标准的服务器模板。
+通过执行这份自动化初始化脚本，您可以快速搭建一套既合规又高效的 RockyLinux 基础服务器环境，省去重复配置时间，并减少人为操作失误风险。欢迎根据自身环境对脚本进行个性化定制，打造符合团队标准的服务器模板。
 
 祝您服务器管理顺利，开发、部署更高效！
