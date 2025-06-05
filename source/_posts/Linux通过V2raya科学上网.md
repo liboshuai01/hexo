@@ -23,9 +23,9 @@ date: 2023-10-14 22:00:10
 > 注意：要使用root用户，如果链接失效，请进行手动安装
 
 ```shell
-wget https://lbs-install.oss-cn-shanghai.aliyuncs.com/v2raya/install_v2ray.sh
+curl -o install_v2ray.sh https://lbs-install.oss-cn-shanghai.aliyuncs.com/v2raya/install_v2ray.sh
 bash ./install_v2ray.sh
-wget https://gh-proxy.com/github.com/v2rayA/v2rayA/releases/download/v2.2.5.8/installer_redhat_x64_2.2.5.8.rpm
+curl -o installer_redhat_x64_2.2.5.8.rpm https://gh-proxy.com/github.com/v2rayA/v2rayA/releases/download/v2.2.5.8/installer_redhat_x64_2.2.5.8.rpm
 sudo rpm -i installer_redhat_x64_2.2.5.8.rpm
 sudo systemctl enable v2raya && sudo systemctl start v2raya
 ```
