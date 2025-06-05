@@ -192,6 +192,43 @@ taskmanager.memory.jvm-overhead.min: 128m
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605162424201.png)
 
+提交作业到flink集群
+---
+
+**1. 打包生成示例jar包**
+
+```shell
+git clone https://github.com/liboshuai01/lbs-demo.git
+cd ./lbs-demo/flink-wordcount
+mvn clean install -DskipTests
+```
+
+然后拷贝`target`中的`flink-wordcount-1.0.jar`到flink项目根目录的`distlib`文件夹中。
+
+**2. 找到提交作业入口类**
+
+通过`ctrl + n`查看类`org.apache.flink.client.cli.CliFrontend`
+
+**3. 修改启动类启动配置**
+
+> Add vm options: `-Dlog.file=./log/flink-hunter-client-hunter.log -Dlog4j.configuration=./conf/log4j-cli.properties -Dlog4j.configurationFile=./conf/log4j-cli.properties -Dlogback.configurationFile=./conf/logback-console.xml `
+> 
+> Program arguments: `run -c com.liboshuai.demo.FlinkWordCountDemo ./distlib/flink-wordcount-1.0.jar`
+> 
+> Environment variables: `FLINK_CONF_DIR=./conf`
+
+![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605185435332.png)
+
+**4. 最后启动主类即可**
+
+![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605185726963.png)
+
+![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605185829558.png)
+
+![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605185922018.png)
+
+![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605185955889.png)
+
 ---
 
 结语
