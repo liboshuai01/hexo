@@ -145,9 +145,7 @@ Kubernetes集群使用不同的IP范围来分配给Pods和服务(Services)。
 1.  **获取K3s CoreDNS Service IP：**
     在您的K3s Master节点上执行：
     ```shell
-    # kubectl get svc -n kube-system kube-dns
-    # 或（更常见的名称）:
-    kubectl get svc -n kube-system coredns
+    kubectl get svc -n kube-system kube-dns
     ```
     您会看到类似输出：
     ```
@@ -165,6 +163,8 @@ Kubernetes集群使用不同的IP范围来分配给Pods和服务(Services)。
     *   在 "首选 DNS 服务器" 中填入您上一步获取的K3s CoreDNS Service IP (例如 `10.43.0.10`)。
     *   **重要：** **不要在 "备用 DNS 服务器" 中填写任何公共DNS服务器**（如 `8.8.8.8` 或您的路由器IP）。如果填写了备用DNS，Windows可能会在首选DNS（CoreDNS）解析内部域名超时或失败时（这对于不存在的内部域名是正常的），转而查询备用DNS，导致内部域名解析失败。如果确实需要备用DNS来解析公网域名，您应该配置CoreDNS使其能够正确转发公网域名的解析请求（通常CoreDNS默认会使用宿主机的 `/etc/resolv.conf` 进行上游转发）。
     *   点击 "确定" 保存设置。
+
+    > 如果启用了IPv6，则也需要对IPv6也进行同样的配置，或者干脆直接禁用IPv6。
 
 3.  **刷新Windows DNS缓存：**
     以管理员权限打开命令提示符，执行：
