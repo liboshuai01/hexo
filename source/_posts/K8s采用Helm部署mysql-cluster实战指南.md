@@ -1,6 +1,5 @@
 ---
 title: K8s采用Helm部署mysql-cluster实战指南
-date: 2025-06-07 05:07:21
 tags:
   - Linux
   - K8s
@@ -10,6 +9,8 @@ categories:
   - 容器化
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250607051028585.png'
 toc: true
+abbrlink: 99c439e4
+date: 2025-06-07 05:07:21
 ---
 
 在构建现代化、可扩展的 Web 应用程序时，一个高可用的数据库是不可或缺的基石。MySQL 的主从（Primary-Secondary）复制架构是实现读写分离、负载均衡和故障转移的经典方案。然而，在 Kubernetes (K8s) 环境中手动部署和管理这样一个有状态的集群，会涉及复杂的配置、网络和存储管理。
