@@ -1,9 +1,9 @@
 ---
 title: 掌握 ssh-keygen：揭秘公钥与私钥的工作原理与生成实践
 tags:
-  - Git
+  - Linux
 categories:
-  - 杂货小铺
+  - 运维手册
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250606180334928.png'
 toc: true
 abbrlink: 21aeb92d
