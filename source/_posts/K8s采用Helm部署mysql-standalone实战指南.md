@@ -19,6 +19,8 @@ date: 2025-06-07 04:23:29
 
 <!-- more -->
 
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/mysql/mysql-standalone), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/mysql/mysql-standalone)
+
 ## 前提条件
 
 在开始之前，请确保您已具备以下环境和工具：

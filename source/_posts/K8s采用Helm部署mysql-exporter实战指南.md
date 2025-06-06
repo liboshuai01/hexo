@@ -20,6 +20,8 @@ date: 2025-06-07 06:15:13
 
 <!-- more -->
 
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/mysql/mysql-exporter), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/mysql/mysql-exporter)
+
 ### 项目结构概览
 
 为了实现标准化部署，我们将项目分解为以下几个文件：
