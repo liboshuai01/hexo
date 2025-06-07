@@ -1,6 +1,5 @@
 ---
 title: K8s采用Helm部署mongodb-standalone实战指南
-date: 2025-06-07 20:54:39
 tags:
   - Linux
   - K8s
@@ -10,6 +9,8 @@ categories:
   - 容器化
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250607205732464.png'
 toc: true
+abbrlink: 1ec68299
+date: 2025-06-07 20:54:39
 ---
 
 在现代后端开发中，将数据库等有状态应用部署在 Kubernetes (K8s) 上已成为主流选择。Kubernetes 提供了强大的编排能力，而 Helm 作为其官方包管理器，极大地简化了复杂应用的部署和生命周期管理。
