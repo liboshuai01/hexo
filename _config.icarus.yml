@@ -235,7 +235,7 @@ widgets:
         # Author's current location
         location: Shang Hai
         # URL or path to the avatar image
-        avatar: https://lbs-images.oss-cn-shanghai.aliyuncs.com/202503181739528.jpg
+        avatar: https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250607154130416.png
         # Whether show the rounded avatar image
         avatar_rounded: true
         # Email address for the Gravatar
