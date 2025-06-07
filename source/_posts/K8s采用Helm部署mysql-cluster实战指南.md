@@ -4,7 +4,7 @@ tags:
   - Linux
   - K8s
   - Helm
-  - mysql
+  - Mysql
 categories:
   - 容器化
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250607051028585.png'
