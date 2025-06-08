@@ -46,6 +46,21 @@ NEW_HOSTNAME="docker"
 # 指定需要配置免密 sudo 及 docker 命令权限的用户名
 USERNAME=lbs
 
+echo "开始替换镜像源..."
+sudo cp -r /etc/yum.repos.d /etc/yum.repos.d.bak
+sudo sed -e 's|^mirrorlist=|#mirrorlist=|g' \
+         -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.aliyun.com/rockylinux|g' \
+         -i.bak \
+         /etc/yum.repos.d/Rocky-*.repo
+sudo yum install -y epel-release
+sudo sed -e 's!^metalink=!#metalink=!g' \
+         -e 's!^#baseurl=!baseurl=!g' \
+         -e 's!https\?://download\.fedoraproject\.org/pub/epel!https://mirrors.aliyun.com/epel!g' \
+         -e 's!https\?://download\.example/pub/epel!https://mirrors.aliyun.com/epel!g' \
+         -i.bak /etc/yum.repos.d/epel{,-testing}.repo
+sudo yum clean all
+sudo yum makecache
+
 echo "开始设置主机名为 '$NEW_HOSTNAME'..."
 hostnamectl set-hostname "$NEW_HOSTNAME"
 
