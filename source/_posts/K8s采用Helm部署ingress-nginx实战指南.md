@@ -1,5 +1,5 @@
 ---
-title: K8s采用Helm部署Ingress-Nginx实战指南
+title: K8s采用Helm部署ingress-nginx实战指南
 tags:
   - Linux
   - K8s
