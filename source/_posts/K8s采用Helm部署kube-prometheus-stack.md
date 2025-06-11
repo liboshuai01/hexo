@@ -21,6 +21,8 @@ date: 2025-06-11 18:30:16
 
 <!-- more -->
 
+> 项目源码: [github](https://github.com/liboshuai01/k8s-stack/tree/master/kube-prometheus-stack), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/kube-prometheus-stack)
+
 ## 一、方案设计：配置与逻辑分离
 
 在进行任何部署之前，一个清晰的架构设计至关重要。为了实现部署的灵活性和可维护性，我们采用**配置与逻辑分离**的最佳实践。
