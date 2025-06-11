@@ -22,7 +22,7 @@ date: 2025-06-11 18:00:00
 
 本文将以一个后端系统专家的视角，详细介绍如何通过Helm这一强大的K8s包管理器，结合自动化脚本，快速、可靠地在K8s集群中部署`nfs-subdir-external-provisioner`，为我们的数据驱动应用提供坚实的存储基础。
 
-<-- more -->
+<!-- more ->
 
 > 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/nfs-subdir-external-provisioner), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/nfs-subdir-external-provisioner)
 
