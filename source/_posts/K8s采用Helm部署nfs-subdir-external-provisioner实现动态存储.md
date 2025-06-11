@@ -11,7 +11,7 @@ categories:
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425104445050.png'
 toc: true
 abbrlink: e3673e0e
-date: 2025-05-05 10:43:17                                                                                                                                                               
+date: 2025-06-11 18:00:00                                                                                                                                                           
 ---
 
 在Kubernetes（K8s）集群中，为应用提供持久化存储是一个核心需求。虽然K8s本身提供了多种存储卷类型，但对于需要多节点读写（`ReadWriteMany`）的场景，或者希望在私有化环境中快速搭建一个可靠共享存储的场景，`hostPath`或K3s默认的`local-path-provisioner`便显得力不从心。它们的存储与特定节点绑定，一旦节点故障，数据访问便会中断，甚至有丢失风险。
