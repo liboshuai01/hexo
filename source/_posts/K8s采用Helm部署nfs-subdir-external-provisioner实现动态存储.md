@@ -14,78 +14,77 @@ abbrlink: e3673e0e
 date: 2025-05-05 10:43:17                                                                                                                                                               
 ---
 
-在Kubernetes集群中实现动态存储分配是提高资源利用率和简化应用部署的关键。本文将详细介绍如何使用Helm部署nfs-subdir-external-provisioner，为K8s集群提供基于NFS的动态存储能力。
+在Kubernetes（K8s）集群中，为应用提供持久化存储是一个核心需求。虽然K8s本身提供了多种存储卷类型，但对于需要多节点读写（`ReadWriteMany`）的场景，或者希望在私有化环境中快速搭建一个可靠共享存储的场景，`hostPath`或K3s默认的`local-path-provisioner`便显得力不从心。它们的存储与特定节点绑定，一旦节点故障，数据访问便会中断，甚至有丢失风险。
+
+为了解决这个问题，NFS（Network File System）提供了一个经典且高效的解决方案。它允许我们在网络中共享一个目录，让集群中的所有节点都能访问，从而为Pod提供真正的共享持久化存储。
+
+然而，手动为每个应用创建NFS对应的`PersistentVolume`（PV）既繁琐又容易出错。这时，`nfs-subdir-external-provisioner`就派上了用场。它是一个动态存储制备器（Dynamic Provisioner），可以监听`PersistentVolumeClaim`（PVC）的创建请求，并自动在NFS服务器上创建一个子目录，然后将其注册为PV，最后与PVC进行绑定。整个过程无需人工干预。
+
+本文将以一个后端系统专家的视角，详细介绍如何通过Helm这一强大的K8s包管理器，结合自动化脚本，快速、可靠地在K8s集群中部署`nfs-subdir-external-provisioner`，为我们的数据驱动应用提供坚实的存储基础。
 
 <-- more -->
 
-> 项目源码：[github](https://github.com/liboshuai01/k8s-stack), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/nfs-subdir-external-provisioner)
+> 项目源码：[github](https://github.com/liboshuai01/k8s-stack/tree/master/nfs-subdir-external-provisioner), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/nfs-subdir-external-provisioner)
 
-## 一、为什么需要动态存储供应
+## 前提准备
 
-在Kubernetes环境中，**持久化存储**是运行有状态应用的基础。传统的手动创建PV（Persistent Volume）方式存在以下问题：
-- 需要管理员预先创建大量PV
-- PV与PVC（Persistent Volume Claim）的匹配过程繁琐
-- 存储资源利用率低下
-
-nfs-subdir-external-provisioner通过**动态存储供应**机制解决了这些问题：
-1. 按需自动创建PV
-2. 自动回收不再使用的存储资源
-3. 简化存储管理流程
-4. 支持多租户环境下的存储隔离
-
-## 二、部署前提准备
+在部署Provisioner之前，我们需要先准备好NFS环境，并确保K8s节点可以访问它。
 
 ### 1. 搭建NFS服务端
 
-在NFS服务器上执行以下命令：
+首先，我们需要一台服务器作为NFS服务端。这里以CentOS为例，执行以下命令来安装并配置NFS服务。
 
 ```shell
-# 安装必要组件
 sudo yum install -y nfs-utils rpcbind
-
-# 启动并启用rpcbind服务
 sudo systemctl enable rpcbind
 sudo systemctl start rpcbind
 
-# 创建共享目录
 sudo mkdir -p /data/nfs/k8s
-
-# 配置共享目录权限
 sudo tee -a /etc/exports <<'EOF'
 /data/nfs/k8s *(insecure,rw,sync,no_root_squash)
 EOF
 
-# 启动NFS服务
 sudo systemctl enable nfs-server
 sudo systemctl start nfs-server
 
-# 刷新并验证导出
 sudo exportfs -r
 sudo exportfs
 ```
 
-### 2. 挂载NFS客户端
+**解析：**
+*   我们安装`nfs-utils`和`rpcbind`。
+*   创建了`/data/nfs/k8s`目录作为NFS的共享根目录。
+*   通过修改`/etc/exports`文件，我们将该目录共享给所有客户端（`*`），并赋予读写（`rw`）、同步写入（`sync`）和允许客户端以root身份访问（`no_root_squash`）的权限。
+*   最后，启动NFS服务并使配置生效。
 
-在所有Kubernetes节点上挂载NFS共享：
+### 2. 在K8s节点挂载NFS客户端
+
+为了让Kubelet能够管理NFS卷，**每一个运行Pod的K8s节点**都需要安装NFS客户端工具，并能够访问NFS共享。
+
+> **注意**：以下命令需要在**所有**需要使用NFS存储的K8s Worker节点上执行。
 
 ```shell
-# 安装客户端工具
 sudo yum install -y nfs-utils
 
-# 创建本地挂载点
+# 此处的master应替换为你的NFS服务端IP或主机名
 sudo mkdir -p /data/nfs/k8s 
 
-# 挂载NFS共享
 sudo mount -t nfs master:/data/nfs/k8s /data/nfs/k8s
 
-# 验证挂载
+# 验证挂载是否成功
 df -h | grep /data/nfs/k8s
 ```
+成功挂载后，我们就可以开始部署核心的Provisioner了。
 
-### 3. 配置环境变量（可选）
+## 安装应用
 
-创建`.env`文件自定义部署参数：
+为了实现标准化和可重复部署，我们将所有配置和命令封装成文件。
 
+### 1. 配置文件 `.env`
+
+创建一个`.env`文件来集中管理所有可变配置，这使得环境迁移和参数调整变得非常简单。
+
+> .env
 ```shell
 # 命名空间
 NAMESPACE="kube-system"
@@ -100,13 +99,16 @@ NFS_PATH="/data/nfs/k8s"
 # 存储类名称
 STORAGE_CLASS_NAME="nfs"
 ```
+**说明：**
+*   `NFS_SERVER`：请修改为你的NFS服务器的实际IP或主机名。
+*   `NFS_PATH`：必须与NFS服务端导出的路径一致。
+*   其他变量如命名空间、版本号等可根据需求自定义。
 
-## 三、安装nfs-subdir-external-provisioner
+### 2. 安装脚本 `install.sh`
 
-### 1. 创建安装脚本
+接下来，编写一个强大的安装脚本，它能加载配置、添加Helm仓库并执行安装或升级操作。
 
-编写`install.sh`脚本：
-
+> install.sh
 ```shell
 #!/usr/bin/env bash
 
@@ -133,57 +135,69 @@ helm upgrade --install ${RELEASE_NAME} nfs-subdir-external-provisioner/nfs-subdi
   --set storageClass.defaultClass=true \
   --set rbac.create=true
 ```
+**脚本亮点：**
+*   `helm upgrade --install`：这是一个幂等操作。如果Release不存在，它会执行安装；如果已存在，则执行升级。这使得脚本可以重复运行。
+*   `--set ...`：通过命令行参数，将`.env`文件中的配置动态地传递给Helm Chart，实现了配置与执行的分离。
+*   `storageClass.defaultClass=true`：我们将新创建的NFS存储类（StorageClass）设置为集群的**默认**存储类。这样，当应用创建PVC时不指定`storageClassName`，将自动使用NFS。
 
-### 2. 执行安装
+### 3. 执行安装
+
+现在，只需一步即可完成部署：
 
 ```shell
-# 添加执行权限
-chmod +x install.sh
-
-# 运行安装脚本
 bash install.sh
 ```
 
-### 3. 清理现有存储类（如使用k3s）
+### 4. 处理K3s环境下的存储类冲突 (可选)
 
+如果您的K8s集群是K3s，它默认会安装`local-path`作为默认的`StorageClass`。为了避免冲突，并让我们的NFS成为唯一的默认存储，需要执行以下步骤。
+
+**1. 取消`local-path`存储类的默认值设置**
 ```shell
-# 取消local-path默认存储类
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+```
 
-# 删除local-path存储类
+**2. （可选）卸载`local-path`存储类**
+如果不再需要，可以彻底删除它。
+```shell
 kubectl delete storageclass local-path
+```
 
-# 禁用k3s的local-path组件
-sudo vim /etc/systemd/system/k3s.service
-# 添加以下参数：
+**3. （推荐）禁用k3s的`local-path`组件**
+为了一劳永逸，可以直接在K3s的启动参数中禁用它，防止K3s重启后再次创建。
+
+修改K3s服务配置文件，例如 `/etc/systemd/system/k3s.service`：
+```
+# sudo vim /etc/systemd/system/k3s.service
 ExecStart=/usr/local/bin/k3s \
   server \
-  --disable local-storage
+  # 添加此行到最后（不要添加注释）
+  --disable local-storage \
 
-# 重新加载并重启服务
+# 重新加载 systemd 配置并重启 K3s 服务
 sudo systemctl daemon-reload
 sudo systemctl restart k3s
 ```
 
-## 四、验证安装结果
+## 验证应用
 
-### 1. 初步验证
+部署完成后，我们需要验证Provisioner是否正常工作。
+
+### 初步验证
+
+运行一个状态检查脚本（`status.sh`，其内容通常是 `helm status $RELEASE_NAME -n $NAMESPACE` 或 `kubectl get pods -n $NAMESPACE -l app=nfs-subdir-external-provisioner`）来查看Provisioner Pod是否正常运行。
 
 ```shell
-# 检查Pod状态
-kubectl get pods -n kube-system -l app=nfs-subdir-external-provisioner
-
-# 检查存储类
-kubectl get storageclass
-
-# 验证默认存储类
-kubectl get storageclass -o json | jq '.items[] | select(.metadata.annotations."storageclass.kubernetes.io/is-default-class" == "true")'
+bash status.sh
 ```
+看到Pod处于`Running`状态即表示初步成功。
 
-### 2. 进阶验证：测试PVC
+### 进阶验证
 
-创建测试PVC配置文件`pvc-test.yaml`：
+真正的考验是创建一个PVC，看系统是否能为其自动创建PV。
 
+**1. 编写测试 PVC 资源配置**
+> pvc-test.yaml
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -198,60 +212,39 @@ spec:
       storage: 10Mi
 ```
 
-应用并验证PVC：
-
+**2. 创建测试 PVC**
 ```shell
-# 创建测试PVC
 kubectl apply -f pvc-test.yaml
-
-# 检查PVC状态
-kubectl get pvc pvc-test
-
-# 理想输出
-NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-pvc-test   Bound    pvc-5b3d7e1e-8e4a-4b7d-9b3c-3b0b3b3b3b3b   10Mi       RWX            nfs            10s
 ```
 
-## 五、应用管理与维护
+**3. 查看测试 PVC 状态**
+```shell
+kubectl get pvc pvc-test
+```
+如果一切顺利，您将看到`STATUS`列为`Bound`。
+```
+NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pvc-test   Bound    pvc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx   10Mi       RWX            nfs            5s
+```
+`Bound`状态表明，`nfs-subdir-external-provisioner`已成功监听到PVC请求，在NFS服务器的`/data/nfs/k8s`目录下创建了一个新的子目录，并创建了对应的PV与`pvc-test`绑定。
 
-### 1. 更新应用
+## 应用生命周期管理
 
-修改`.env`或`install.sh`中的配置后，重新执行安装脚本：
+### 更新应用
 
+得益于我们的自动化脚本，更新非常简单。只需修改`.env`文件（例如升级`CHART_VERSION`）或`install.sh`中的`--set`参数，然后重新执行安装脚本即可。
 ```shell
 bash install.sh
 ```
 
-### 2. 卸载应用
+### 卸载应用
 
-创建`uninstall.sh`卸载脚本：
-
-```shell
-#!/usr/bin/env bash
-
-source .env
-
-helm uninstall ${RELEASE_NAME} -n ${NAMESPACE}
-kubectl delete storageclass ${STORAGE_CLASS_NAME}
-```
-
-执行卸载：
-
+我们同样可以创建一个`uninstall.sh`脚本（内容为`helm uninstall $RELEASE_NAME -n $NAMESPACE`），或者直接执行卸载命令。
 ```shell
 bash uninstall.sh
 ```
+**重要**：卸载操作会删除Provisioner的Pod、ServiceAccount、RBAC规则以及`StorageClass`，但**不会删除NFS服务器上的任何数据**。这正是持久化存储的意义所在，应用与数据生命周期分离。
 
-## 六、总结
+## 总结
 
-通过本文的部署流程，我们成功实现了：
-
-1. **自动化存储供应**：应用程序只需声明PVC即可自动获得存储资源
-2. **资源高效利用**：按需分配存储空间，避免资源浪费
-3. **简化运维流程**：通过Helm实现一键部署和升级
-4. **多租户支持**：每个命名空间自动创建独立子目录
-
-nfs-subdir-external-provisioner特别适合以下场景：
-- 开发测试环境快速搭建
-- 中小规模生产环境
-- 需要共享存储的应用（如WordPress、GitLab等）
-- 资源受限的边缘计算场景
+通过结合Helm和自动化Shell脚本，我们成功地为Kubernetes集群部署了一套健壮、自动化的NFS动态存储解决方案。这种方法不仅极大地简化了初始部署，更为后续的运维、升级和迁移提供了极大的便利。它为我们部署需要共享存储的微服务（如高可用WordPress、分布式文件系统），或是需要稳定持久化层的数据处理应用（如数据库、消息队列）奠定了坚实的基础。这是构建高性能、数据驱动后端系统不可或缺的一环。
