@@ -18,6 +18,8 @@ date: 2025-06-11 18:26:25
 
 <!-- more -->
 
+> 项目源码: [github](https://github.com/liboshuai01/k8s-stack/tree/master/ingress-nginx), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/ingress-nginx)
+
 ## 核心思路
 
 我们的目标是构建一个健壮、高可用的入口流量解决方案。核心思路如下：
