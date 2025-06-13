@@ -20,6 +20,30 @@ date: 2025-06-11 18:26:25
 
 > 项目源码: [github](https://github.com/liboshuai01/k8s-stack/tree/master/ingress-nginx), [gitee](https://gitee.com/liboshuai01/k8s-stack/tree/master/ingress-nginx)
 
+## Ingress-Nginx 部署模式简介
+
+在开始之前，我们先简单回顾一下 Ingress-Nginx 常见的几种部署模式：
+
+1.  **Deployment + LoadBalancer Service:**
+    *   原理: Ingress Controller Pods 由 Deployment 管理。创建一个 `type: LoadBalancer` 的 Service 指向这些 Pods。云厂商会自动创建并关联一个外部负载均衡器及公网 IP。
+    *   优点: 易于与公有云集成，自动获取公网 IP 和负载均衡。
+    *   缺点: 依赖云厂商支持，可能产生额外费用，网络路径相对较长。
+    *   适用场景: 公有云环境。
+
+2.  **Deployment + NodePort Service:**
+    *   原理: Ingress Controller Pods 由 Deployment 管理。创建一个 `type: NodePort` 的 Service 指向这些 Pods。Ingress Controller 会暴露在集群每个节点的一个静态高位端口上。
+    *   优点: 不依赖特定云厂商，部署相对简单。
+    *   缺点: NodePort 端口通常在高位范围 (30000-32767)，需要外部负载均衡器将 80/443 端口的流量转发到节点的 NodePort。增加了一层转发。
+    *   适用场景: 自建机房或需要手动控制负载均衡器的环境。
+
+3.  **DaemonSet + HostNetwork:**
+    *   原理: Ingress Controller Pods 由 DaemonSet 管理，确保在指定的每个节点上都运行一个 Pod。Pod 配置 `hostNetwork: true`，直接使用宿主机的网络命名空间，监听宿主机的 80/443 端口。
+    *   优点: 网络路径最短，性能通常最优。
+    *   缺点: Pod 直接占用宿主机端口，可能冲突。每个节点只能运行一个监听相同端口的 Ingress Controller Pod。需通过 `nodeSelector` 或 `affinity` 精确控制部署节点。
+    *   适用场景: 对性能要求高、网络延迟敏感的生产环境，且有专用节点承载 Ingress 流量。
+
+**本文重点实践 `DaemonSet + HostNetwork` 模式，并通过脚本进行部署。** 这种模式下，Ingress Controller Pod 直接监听宿主机节点的物理网络端口（如80和443），流量直接到达，无需额外的 Service 层转发，从而获得最佳性能和最低延迟。
+
 ## 核心思路
 
 我们的目标是构建一个健壮、高可用的入口流量解决方案。核心思路如下：
