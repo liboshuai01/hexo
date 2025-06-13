@@ -6,7 +6,6 @@ tags:
   - 大数据
 categories:
   - 容器化
-  - 大数据
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250614063036471.png'
 toc: true
 abbrlink: 61a88c8b
