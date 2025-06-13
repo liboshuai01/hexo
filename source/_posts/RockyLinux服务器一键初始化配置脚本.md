@@ -32,8 +32,6 @@ date: 2024-03-23 21:42:31
 cat > init-rockyLinux.sh << "EOF" && chmod +x init-rockyLinux.sh && ./init-rockyLinux.sh
 #!/bin/bash
 
-set -e
-
 # 确保脚本以 root 身份执行
 if [ "$(id -u)" -ne 0 ]; then
   echo "错误：该脚本需要以 root 身份运行。"
