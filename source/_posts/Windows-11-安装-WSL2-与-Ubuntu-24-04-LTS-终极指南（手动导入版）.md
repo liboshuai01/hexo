@@ -4,7 +4,7 @@ tags:
   - Linux
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250617075923012.png'
+cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250617081325267.png'
 toc: true
 abbrlink: 682b9c2e
 date: 2025-06-17 07:57:23
