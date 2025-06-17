@@ -26,7 +26,8 @@ date: 2025-06-17 07:57:23
 要运行 WSL，首先需要确保 Windows 系统的相关功能已经启用。这包括 WSL 自身以及其所依赖的虚拟机平台。
 
 1.  打开 **控制面板** -> **程序** -> **启动或关闭 Windows 功能**。
-2.  在弹出的窗口中，找到并勾选以下两项：
+2.  在弹出的窗口中，找到并勾选以下三项：
+    *   **Hyper-V**
     *   **适用于 Linux 的 Windows 子系统 (Windows Subsystem for Linux)**
     *   **虚拟机平台 (Virtual Machine Platform)**
 
