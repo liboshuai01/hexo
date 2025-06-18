@@ -29,7 +29,9 @@ date: 2025-06-18 12:51:49
 *   **线程池：** `CompletableFuture` 背后的动力引擎，以及如何正确使用它。
 *   **实战技巧与最佳实践：** 超时处理、避免陷阱，写出优雅高效的并发代码。
 
-### 1. The "Future" Was Not Enough - `Future` 的困境
+<!-- more -->
+
+## 1. The "Future" Was Not Enough - `Future` 的困境
 
 在深入 `CompletableFuture` 之前，我们必须理解它要解决的问题。`java.util.concurrent.Future` 是一个简单的异步计算模型，它代表一个未来某个时刻会产生的结果。但它的主要问题在于：**它太被动了**。
 
@@ -56,7 +58,7 @@ System.out.println(result);
 
 `CompletableFuture` 实现了 `Future` 接口，并新增了 `CompletionStage` 接口，它带来了函数式编程的理念，让我们能够以一种**声明式、非阻塞**的方式来编排和组合异步任务。
 
-### 2. `CompletableFuture` 核心思想：异步任务编排
+## 2. `CompletableFuture` 核心思想：异步任务编排
 
 想象一下你去一家高级餐厅点餐的流程：
 
@@ -67,7 +69,7 @@ System.out.println(result);
 
 `CompletableFuture` 就是这张神奇的订单小票，你可以不断地在上面追加指令，而不需要阻塞自己去等待每一步的完成。它的核心就是**从管理线程和等待，转向描述任务之间的数据流和依赖关系**。
 
-### 3. 创建 `CompletableFuture`：四种主要方式
+## 3. 创建 `CompletableFuture`：四种主要方式
 
 ```java
 // 1. 运行一个不返回结果的异步任务 (Runnable)
@@ -92,7 +94,7 @@ manualFuture.complete("Manually completed!");
 ```
 **注意**：不带 `Executor` 参数的 `runAsync` 和 `supplyAsync` 方法会默认使用 `ForkJoinPool.commonPool()`，我们将在后面详细讨论这带来的影响。
 
-### 4. 任务编排：`CompletableFuture` 的魔法核心 (The `then...` Family)
+## 4. 任务编排：`CompletableFuture` 的魔法核心 (The `then...` Family)
 
 这是 CF 最强大的部分。所有以 `then` 开头的方法都用于创建一个任务流水线。它们分为三类：
 
@@ -100,7 +102,7 @@ manualFuture.complete("Manually completed!");
 *   `thenAccept` / `thenAcceptBoth`: 对结果进行**消费**，无返回值。
 *   `thenRun` / `runAfterBoth`: 任务完成后**执行一个动作**，不关心结果。
 
-#### 4.1 `thenApply` vs `thenCompose`：转换与串联
+### 4.1 `thenApply` vs `thenCompose`：转换与串联
 
 这两个方法最容易混淆，但至关重要。
 
@@ -128,7 +130,7 @@ manualFuture.complete("Manually completed!");
     ```
     **经验法则：如果你的转换逻辑本身就是一个异步操作，请使用 `thenCompose`。**
 
-#### 4.2 `thenAccept` 与 `thenRun`：消费结果与执行动作
+### 4.2 `thenAccept` 与 `thenRun`：消费结果与执行动作
 
 *   **`thenAccept(Consumer)`**：接收上一步的结果，并对其进行消费，但没有返回值（`Void`）。
     ```java
@@ -143,7 +145,7 @@ manualFuture.complete("Manually completed!");
                      .thenRun(() -> System.out.println("Task finished, cleaning up..."));
     ```
 
-#### 4.3 组合两个独立的 Future
+### 4.3 组合两个独立的 Future
 
 *   **`thenCombine(other, BiFunction)`**: 当**两个**独立的 Future 都完成时，将它们的结果作为 `BiFunction` 的参数，返回一个新的结果。
     ```java
@@ -157,7 +159,7 @@ manualFuture.complete("Manually completed!");
     System.out.println("BMI is: " + bmiFuture.get());
     ```
 
-### 5. 组合多个 `CompletableFuture`：`allOf` 与 `anyOf`
+## 5. 组合多个 `CompletableFuture`：`allOf` 与 `anyOf`
 
 *   **`CompletableFuture.allOf(cfs...)`**: 当所有给定的 CF 都完成时，返回的 CF 才会完成。注意，它返回的是 `CompletableFuture<Void>`，你无法直接从中获取所有结果。
     ```java
@@ -194,7 +196,7 @@ manualFuture.complete("Manually completed!");
     System.out.println("First result: " + first.join()); // 输出 "Fastest source"
     ```
 
-### 6. 优雅的异常处理：`exceptionally` 与 `handle`
+## 6. 优雅的异常处理：`exceptionally` 与 `handle`
 
 *   **`exceptionally(Function)`**: 像 `try-catch` 中的 `catch` 块。当流水线中任何一步出现异常时，它会跳过后续的 `thenApply` 等，直接进入 `exceptionally` 块，你可以在这里提供一个默认值或进行补救。
     ```java
@@ -225,7 +227,7 @@ manualFuture.complete("Manually completed!");
     ```
 
 
-### 7. 线程池：不可忽视的幕后英雄
+## 7. 线程池：不可忽视的幕后英雄
 
 这是一个**至关重要**且常常被忽视的点。
 
@@ -234,7 +236,7 @@ manualFuture.complete("Manually completed!");
 *   **默认线程池 `ForkJoinPool.commonPool()`**：所有不带 `Executor` 参数的`Async`方法（如 `supplyAsync`, `thenApplyAsync`）都使用这个全局共享的线程池。它的线程数默认为 `Runtime.getRuntime().availableProcessors() - 1`。
 *   **风险**：`commonPool` 是为 CPU 密集型任务设计的。如果你的任务是 I/O 密集型（如数据库查询、HTTP请求），这些任务会长时间阻塞线程，并且不释放 CPU。如果你大量使用这样的任务，会迅速耗尽 `commonPool` 中的所有线程，导致整个 JVM 中所有依赖 `commonPool` 的功能（例如并行流 `parallelStream`）都发生性能雪崩。
 
-#### **最佳实践：为不同类型的任务创建专用线程池！**
+### **最佳实践：为不同类型的任务创建专用线程池！**
 
 ```java
 // 为 I/O 密集型任务创建一个专用的线程池
@@ -251,7 +253,7 @@ CompletableFuture<String> processedFuture = dbFuture.thenApplyAsync(this::proces
 ```
 **关键区别**：`thenApply` 会尝试使用上一个阶段的线程。而 `thenApplyAsync(..., executor)` 会将任务提交到你指定的 `executor` 中执行，实现线程切换，隔离不同类型的任务。
 
-### 8. 实战技巧与注意事项
+## 8. 实战技巧与注意事项
 
 1.  **超时处理 (Java 9+)**
     *   `orTimeout(long timeout, TimeUnit unit)`: 如果在指定时间内未完成，将以 `TimeoutException` 异常完成。
@@ -268,7 +270,7 @@ CompletableFuture<String> processedFuture = dbFuture.thenApplyAsync(this::proces
 3.  **命名你的线程池**
     使用 `ThreadFactory` (如 Guava 的 `ThreadFactoryBuilder`) 给你的线程池命名。当出现问题时，清晰的线程名（如 `io-pool-1`, `rpc-pool-5`）在线程 dump 和日志中会非常有价值。
 
-### 总结
+## 总结
 
 `CompletableFuture` 是 Java 并发工具箱中的一把瑞士军刀，它将你从繁琐的线程管理和阻塞等待中解放出来。通过它，你可以用一种优雅的、声明式的、函数式的方式来编排复杂的异步工作流。
 
