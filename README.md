@@ -9,7 +9,7 @@
 ## 技术栈
 
 - **框架:** Hexo
-- **包管理:** pnpm (根据 `pnpm-lock.yaml` 判断)
+- **包管理:** yarn (根据 `yarn-lock.yaml` 判断)
 - **前端:** 依赖 Hexo 主题（本项目可能使用了 `butterfly` 和 `landscape` 主题，具**体使用哪个**可以在 `_config.yml` 中配置）
 - **开发语言:** JavaScript (Node.js 环境)
 
@@ -22,7 +22,7 @@
 ## 环境要求
 
 - [Node.js](https://nodejs.org/) (建议使用 LTS 版本)
-- [pnpm](https://pnpm.io/installation) (或者 npm/yarn, 具体使用哪个取决于您首次安装依赖时的方式)
+- [yarn](https://yarn.io/installation) (或者 npm/yarn, 具体使用哪个取决于您首次安装依赖时的方式)
 
 ## 快速开始 (本地开发)
 
@@ -35,7 +35,7 @@
 
 2.  **安装依赖:**
     ```bash
-    pnpm install
+    yarn install
     ```
     (如果您 prefer 或使用 npm 或 yarn，请替换为 `npm install` 或 `yarn install`)
 
@@ -96,7 +96,7 @@ hexo deploy
 - `db.json`: Hexo 的数据缓存文件。
 - `LICENSE`: 项目的许可证信息 (如果包含)。
 - `package.json`: Node.js 项目的配置文件，记录项目信息和依赖。
-- `pnpm-lock.yaml`: 使用 pnpm 安装依赖时生成的锁定文件，确保依赖版本一致性。
+- `yarn-lock.yaml`: 使用 yarn 安装依赖时生成的锁定文件，确保依赖版本一致性。
 - `.gitignore`: Git 版本控制忽略文件，在此文件中的文件不会被 Git 跟踪。
 
 ---
