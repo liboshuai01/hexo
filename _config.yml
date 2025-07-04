@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 技术博客
+title: '技术博客'
 subtitle: '李博帅'
-description: '记录自己的技术成长'
+description:
 keywords:
-author: 李博帅
-language: zh-CN
+author: '李博帅'
+language: 'zh-CN'
 timezone: 'Asia/Shanghai'
 
 # URL
