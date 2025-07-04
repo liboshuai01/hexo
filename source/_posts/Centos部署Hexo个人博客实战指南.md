@@ -237,7 +237,7 @@ git config --global user.name "BoShuai Li"
     
    ```shell
    # 安装主题依赖
-   yarn add hexo-renderer-pug hexo-renderer-stylus hexo-deployer-git hexo-abbrlink hexo-wordcount
+   yarn add hexo-renderer-pug hexo-renderer-stylus hexo-deployer-git hexo-abbrlink hexo-wordcount hexo-generator-searchdb
    # git clone主题
    git clone -b master https://github.com/jerryc127/hexo-theme-butterfly.git themes/butterfly
    
@@ -880,7 +880,7 @@ math:
 search:
    # Choose: algolia_search / local_search / docsearch
    # leave it empty if you don't need search
-   use: docsearch
+   use: local_search
    placeholder:
 
    # Algolia Search
@@ -891,19 +891,19 @@ search:
    # Local Search
    local_search:
       # Preload the search data when the page loads.
-      preload: false
+      preload: true
       # Show top n results per article, show all results by setting to -1
-      top_n_per_article: 1
+      top_n_per_article: -1
       # Unescape html strings to the readable one.
-      unescape: false
+      unescape: true
       CDN:
 
    # Docsearch
    # https://docsearch.algolia.com/
    docsearch:
-      appId: ESM193CRTY
-      apiKey: 06e459c038717ea8ad265ee4b6f04bbf
-      indexName: lbs
+      appId:
+      apiKey:
+      indexName:
       option:
 
 # --------------------------------------
