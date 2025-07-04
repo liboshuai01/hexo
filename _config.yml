@@ -3,22 +3,30 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
+title: 技术博客
+subtitle: '李博帅'
+description: '记录自己的技术成长'
 keywords:
-author: John Doe
-language: en
-timezone: ''
+author: 李博帅
+language: zh-CN
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
-permalink: :year/:month/:day/:title/
+url: https://lbs.wiki
+#permalink: :year/:month/:day/:title/
+permalink: '/pages/:abbrlink/'
 permalink_defaults:
 pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
   trailing_html: true # Set to false to remove trailing '.html' from permalinks
+# abbrlink config
+abbrlink:
+  alg: crc32      # Algorithm used to calc abbrlink. Support crc16(default) and crc32
+  rep: hex        # Representation of abbrlink in URLs. Support dec(default) and hex
+  drafts: false   # Whether to generate abbrlink for drafts. (false in default)
+  force: false    # Enable force mode. In this mode, the plugin will ignore the cache, and calc the abbrlink for every post even it already had an abbrlink. (false in default)
+  writeback: true # Whether to write changes to front-matters back to the actual markdown files. (true in default)
 
 # Directory
 source_dir: source
@@ -93,12 +101,14 @@ include:
 exclude:
 ignore:
 
-# Extensions
-## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 theme: butterfly
+# Extensions
+## Plugins: https://hexo.io/plugins/
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: 'git'
+  repo: ssh://root@lbs.wiki:22222/root/document/hexo.git
+  branch: master
