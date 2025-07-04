@@ -469,7 +469,7 @@ math:
 search:
   # Choose: algolia_search / local_search / docsearch
   # leave it empty if you don't need search
-  use: docsearch
+  use: local_search
   placeholder:
 
   # Algolia Search
@@ -480,9 +480,9 @@ search:
   # Local Search
   local_search:
     # Preload the search data when the page loads.
-    preload: false
+    preload: true
     # Show top n results per article, show all results by setting to -1
-    top_n_per_article: 1
+    top_n_per_article: -1
     # Unescape html strings to the readable one.
     unescape: false
     CDN:
@@ -490,9 +490,9 @@ search:
   # Docsearch
   # https://docsearch.algolia.com/
   docsearch:
-    appId: ESM193CRTY
-    apiKey: 06e459c038717ea8ad265ee4b6f04bbf
-    indexName: lbs
+    appId:
+    apiKey:
+    indexName:
     option:
 
 # --------------------------------------
