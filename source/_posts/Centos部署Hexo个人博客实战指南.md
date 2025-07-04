@@ -893,7 +893,7 @@ search:
       # Preload the search data when the page loads.
       preload: true
       # Show top n results per article, show all results by setting to -1
-      top_n_per_article: -1
+      top_n_per_article: 3
       # Unescape html strings to the readable one.
       unescape: true
       CDN:
