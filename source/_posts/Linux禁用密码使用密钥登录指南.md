@@ -1,12 +1,13 @@
 ---
 title: Linux禁用密码使用密钥登录指南
-date: 2025-07-06 06:06:11
 tags:
   - Linux
 categories:
   - 运维手册
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250706060731912.png'
 toc: true
+abbrlink: d37046a
+date: 2025-07-06 06:06:11
 ---
 
 还在担心密码被暴力破解吗？本文提供了一份清晰、直接的操作指南，将带你一步步为Linux服务器禁用不安全的密码认证，并配置SSH密钥登录，从根本上加固你的服务器安全防线。
@@ -97,7 +98,7 @@ ssh username@your_server_ip
 
 1.  编辑SSH服务配置文件。
     ```bash
-    sudo nano /etc/ssh/sshd_config
+    sudo vim /etc/ssh/sshd_config
     ```
 
 2.  找到并修改以下三项，确保它们的值如下（如果被 `#` 注释，请去掉 `#`）：
