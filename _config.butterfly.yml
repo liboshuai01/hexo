@@ -757,6 +757,39 @@ site_verification:
 #   meta_theme_color_light: "ffffff"
 #   meta_theme_color_dark: "#0d0d0d"
 
+theme_color:
+  enable: true
+  # 主要强调色：一个专业且不过于鲜艳的蓝色，用于按钮、链接活跃状态等
+  main: "#367CFF" # 专业蓝，比原先的更沉稳
+  # 分页器颜色：与主色调保持一致，增强统一性
+  paginator: "#367CFF"
+  # 按钮悬停颜色：使用深灰色，显得内敛而有质感
+  button_hover: "#4A4A4A"
+  # 文本选中颜色：使用主色调，直观且与整体风格协调
+  text_selection: "#367CFF"
+  # 链接颜色：采用一个略带蓝色的中性灰，突出但不跳跃
+  link_color: "#5A6B80" # 接近蓝色的深灰，有别于正文但又很稳重
+  # 元信息颜色（例如日期、作者等）：使用中等灰色，易读且不抢眼
+  meta_color: "#6B6B6B" # 比原先的略深，对比度更好
+  # 分隔线颜色：非常浅的灰色，提供分隔感而不突兀
+  hr_color: "#E0E0E0"
+  # 代码块前景颜色：保持原有的橙红色，因为这是代码高亮的常见做法，能有效区分
+  code_foreground: "#F47466"
+  # 代码块背景颜色：保持不变，半透明的深色是很好的选择
+  code_background: "rgba(27, 31, 35, .05)"
+  # TOC（目录）颜色：与主色调保持一致，用于可点击的目录项
+  toc_color: "#367CFF"
+  # 引用块（blockquote）左边条颜色：使用非常浅的灰色或一个微弱的强调色，避免过于醒目
+  blockquote_padding_color: "#D3DCE6" # 柔和的浅蓝色灰色，替代了醒目的主色
+  # 引用块背景颜色：使用非常浅的灰色，让引用块更内敛
+  blockquote_background_color: "#F8F8F8" # 接近白色，提供轻微的区分
+  # 滚动条颜色：与主色调保持一致，提供统一的用户体验
+  scrollbar_color: "#367CFF"
+  # 针对浅色主题的 meta 颜色：白色背景
+  meta_theme_color_light: "ffffff"
+  # 针对深色主题的 meta 颜色：极深灰色背景
+  meta_theme_color_dark: "#0d0d0d"
+
 # The user interface setting of category and tag page
 # Choose: index - same as Homepage UI / default - same as archives UI
 # leave it empty or index
