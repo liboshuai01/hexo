@@ -288,7 +288,7 @@ aside:
       enable: true
       icon: fab fa-github
       text: Follow Me
-      link: https://github.com/xxxxxx
+      link: https://github.com/liboshuai01
   card_announcement:
     enable: true
     content: 记录自己的学习成长
