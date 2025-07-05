@@ -1,5 +1,5 @@
 ---
-title: CentOS系统指定版本Docker与Docker Compose在线安装教程
+title: CentOS系统在线安装docker与docker-compose实战指南
 tags:
   - Linux
   - Centos

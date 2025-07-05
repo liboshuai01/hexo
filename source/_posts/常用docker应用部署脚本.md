@@ -15,6 +15,41 @@ date: 2024-07-11 00:19:03
 
 <!-- more -->
 
+McsManager
+---
+
+```shell
+# .env文件内容
+
+INSTALL_PATH=/home/lbs/docker/mcsmanager
+```
+
+```yaml
+# docker-compose.yml
+services:
+  web:
+    image: githubyumao/mcsmanager-web:latest
+    ports:
+      - "23333:23333"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${INSTALL_PATH}/web/data:/opt/mcsmanager/web/data
+      - ${INSTALL_PATH}/web/logs:/opt/mcsmanager/web/logs
+
+  daemon:
+    image: githubyumao/mcsmanager-daemon:latest
+    restart: unless-stopped
+    ports:
+      - "24444:24444"
+    environment:
+      - MCSM_DOCKER_WORKSPACE_PATH=${INSTALL_PATH}/daemon/data/InstanceData
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${INSTALL_PATH}/daemon/data:/opt/mcsmanager/daemon/data
+      - ${INSTALL_PATH}/daemon/logs:/opt/mcsmanager/daemon/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+```
+
 Openwebui
 ---
 
@@ -22,6 +57,7 @@ Openwebui
 # .env文件内容
 HOST_IP=宿主机IP
 ```
+
 ```yaml
 version: '3.8'
 
