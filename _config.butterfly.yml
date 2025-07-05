@@ -114,8 +114,8 @@ error_img:
 # A simple 404 page
 error_404:
   enable: true
-  subtitle: 'Page Not Found'
-  background: https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250704172657502.png
+  subtitle: '页面没有找到'
+  background: https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250705092755902.png
 
 post_meta:
   # Home Page
