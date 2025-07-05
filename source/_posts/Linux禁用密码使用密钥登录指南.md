@@ -1,5 +1,5 @@
 ---
-title: Linux禁用密码登录使用更安全的密钥登录指南
+title: Linux禁用密码使用密钥登录指南
 date: 2025-07-06 06:06:11
 tags:
   - Linux
