@@ -15,6 +15,28 @@ date: 2024-07-11 00:19:03
 
 <!-- more -->
 
+Memos
+---
+
+```yaml
+version: '2.1'
+
+services:
+  memos:
+    image: neosmemo/memos:stable
+    container_name: memos
+    volumes:
+      - data:/var/opt/memos
+    ports:
+      - '25230:25230'
+    environment:
+      - MEMOS_PORT=25230
+    mem_limit: 4g
+
+volumes:
+  data:
+```
+
 McsManager
 ---
 
