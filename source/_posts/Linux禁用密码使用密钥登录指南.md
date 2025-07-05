@@ -2,6 +2,7 @@
 title: Linux禁用密码使用密钥登录指南
 tags:
   - Linux
+  - Ssh
 categories:
   - 运维手册
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250706060731912.png'
