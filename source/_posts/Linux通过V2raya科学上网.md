@@ -34,7 +34,7 @@ sudo systemctl enable v2raya && sudo systemctl start v2raya
 ---
 
 ### 安装v2ray
-1. 浏览器访问install-release.sh，复制网页中的所有内容
+1. 浏览器访问[install-release.sh](https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)，复制网页中的所有内容
    ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130125572.png)
 
 2. 登录服务器，执行`vim install.sh`命令，粘贴内容
