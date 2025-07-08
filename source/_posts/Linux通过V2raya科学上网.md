@@ -87,3 +87,18 @@ sudo systemctl enable v2raya && sudo systemctl start v2raya
 
 9. 设置系统代理规则
    ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130129022.png)
+
+10. [可选] 修改端口
+
+```bash
+# 编辑v2raya.service配置文件
+vim /usr/lib/systemd/system/v2raya.service
+
+# 修改前
+ExecStart=/usr/bin/v2raya --log-disable-timestamp
+# 修改后（修改2017为自定义端口）
+ExecStart=/usr/bin/v2raya --log-disable-timestamp --address 0.0.0.0:2017
+
+sudo systemctl daemon-reload
+sudo systemctl restart v2raya
+```
