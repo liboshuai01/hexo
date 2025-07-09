@@ -90,11 +90,10 @@ server {
     ssl_certificate_key /etc/nginx/ssl/your_domain.com.key;
 
     # --- SSL 性能与安全优化 (推荐) ---
-    ssl_protocols TLSv1.2 TLSv1.3; # 推荐使用较新的协议
-    ssl_ciphers 'TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:ECDHE-RSA-AES256-GCM-SHA384'; # 使用安全的加密套件
-    ssl_prefer_server_ciphers on; # 服务端加密套件优先
-    ssl_session_cache shared:SSL:10m; # 开启会话缓存，提高性能
-    ssl_session_timeout 10m;
+    ssl_session_cache   shared:SSL:1m;
+    ssl_session_timeout   5m;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers   on;
 
     # --- 网站内容配置 (根据你的需求二选一) ---
 
