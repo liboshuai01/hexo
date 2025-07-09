@@ -1,15 +1,16 @@
 ---
 title: Nginx 开启 HTTPS：SSL 证书配置指南
-date: 2025-07-09 16:54:19
 tags:
   - Linux
   - Nginx
-  - HTTPS
-  - SSL
+  - Https
+  - Ssl
 categories:
   - 运维手册
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250709165701129.png'
 toc: true
+abbrlink: a549c8a6
+date: 2025-07-09 16:54:19
 ---
 
 在当今的互联网环境中，为你的网站启用 HTTPS 不再是“可选项”，而是“必选项”。HTTPS 不仅能保障数据传输安全、防止内容被篡改，还能提升用户信任度和搜索引擎排名。本文将为你提供一份清晰、精简的 Nginx 配置 SSL 证书的操作指南，让你能快速为自己的网站部署 HTTPS。
