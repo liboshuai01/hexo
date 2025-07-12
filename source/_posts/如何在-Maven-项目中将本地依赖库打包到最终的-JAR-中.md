@@ -1,6 +1,7 @@
 ---
 title: 如何在 Maven 项目中将本地依赖库打包到最终的 JAR 中
 tags:
+  - Jar
   - Maven
 categories:
   - 杂货小铺
