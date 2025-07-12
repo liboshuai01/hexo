@@ -88,7 +88,7 @@ Nexus3支持多种仓库类型，我们将创建以下四种常用Maven仓库：
 这个仓库将代理Maven中央仓库和阿里Maven仓库，加速依赖下载。
 *   选择类型：`maven2 (proxy)`
 *   名称：`lbs-central`
-*   远程存储地址 (Remote storage)：填写 `http://maven.aliyun.com/nexus/content/groups/public/`
+*   远程存储地址 (Remote storage)：填写 `https://maven.aliyun.com/repository/central`
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250712131818169.png)
 
@@ -96,7 +96,7 @@ Nexus3支持多种仓库类型，我们将创建以下四种常用Maven仓库：
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250712131956719.png)
 
-![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250712132725082.png)
+![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250712144503974.png)
 
 点击“**Create repository**”完成创建。
 
