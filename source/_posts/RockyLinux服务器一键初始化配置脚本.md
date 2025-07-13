@@ -97,7 +97,7 @@ fi
 sysctl -p
 
 echo "安装常用基础工具包..."
-yum install -y vim git curl wget unzip zip lrzsz net-tools epel-release tree gcc automake autoconf libtool make openssl yum-utils device-mapper-persistent-data lvm2 chrony htop
+yum install -y vim git curl wget unzip zip lrzsz net-tools epel-release tree gcc automake autoconf libtool make openssl yum-utils device-mapper-persistent-data lvm2 chrony htop netcat
 
 echo "同步时间..."
 sudo systemctl enable --now chronyd
