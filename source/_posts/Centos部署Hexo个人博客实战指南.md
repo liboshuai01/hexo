@@ -215,8 +215,6 @@ corepack enable yarn
 yarn -v
 ```
 
-![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130149026.png)
-
 ### 安装hexo环境
 
 1. 新建一个目录用于存储个人博客数据，例如：`C:\Me\Project\other`。
