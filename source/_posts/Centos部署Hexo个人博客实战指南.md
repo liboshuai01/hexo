@@ -227,7 +227,7 @@ yarn -v
 
     ```shell
     # 全局安装hexo-cli
-    yarn install -g hexo-cli
+    yarn global add hexo-cli
     # 创建并进入博客目录
     hexo init blog && cd blog
     # 安装项目依赖
