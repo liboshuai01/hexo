@@ -200,7 +200,20 @@ git config --global user.name "BoShuai Li"
 
 ### 安装nodejs与yarn环境
 
-打开[node.js-download](https://nodejs.org/en/download)这个链接，选择符合自己的系统环境复制命令到终端进行下载安装即可。
+> 要有科学的魔法哦，不然会yarn会安装失败的哦！
+
+打开[node-v18.20.8-x64.msi](https://nodejs.org/dist/v18.20.8/node-v18.20.8-x64.msi)这个链接，会自动下载`node.js`的`v18.20.8`版本安装包。
+打开安装程序，一路下一步即可，然后使用管理员权限打开`Git Bash`。执行以下命令：
+```bash
+# Verify the Node.js version:
+node -v # Should print "v18.20.8".
+
+# Download and install Yarn:
+corepack enable yarn
+
+# Verify Yarn version:
+yarn -v
+```
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130149026.png)
 
