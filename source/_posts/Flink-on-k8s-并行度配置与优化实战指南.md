@@ -1,6 +1,5 @@
 ---
-title: Flink on k8s 并行度配置与优化实战指南
-date: 2025-07-15 03:23:02
+title: Flink on k8s：并行度配置与优化实战指南
 tags:
   - Flink
   - K8s
@@ -10,6 +9,8 @@ categories:
   - 大数据
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250715032618358.png'
 toc: true
+abbrlink: 8fb5dd5f
+date: 2025-07-15 03:23:02
 ---
 
 Apache Flink 在 Kubernetes (K8s) 上部署时，并行度是影响作业性能和资源利用率的关键因素。本文将深入探讨 Flink on K8s 环境中并行度相关的配置项，并通过测试案例总结其作用机制，最后给出实际应用中的优化建议。
