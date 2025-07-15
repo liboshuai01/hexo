@@ -31,13 +31,7 @@ Flink on K8s环境中，有几个关键配置项共同决定了作业的并行�
 
 ### taskManager.replicas
 
-taskManager.replicas是Flink官网关于作业并行度配置的说明中列出的一个配置项 。它控制着Flink集群中TaskManager Pods的数量。在Kubernetes环境中，每个TaskManager Pod通常对应一个或多个物理节点上的计算实例，因此它是Kubernetes层面控制计算资源实例数量的关键参数。
-
-然而，通过测试观察发现，taskManager.replicas并非TaskManager数量的硬性上限。例如，在测试1中，尽管YAML配置中taskManager.replicas设置为1，但实际启动了2个TaskManager。类似地，在测试6中，
-
-taskManager.replicas也设置为1，但实际启动了4个TaskManager 。这种现象表明，在Flink Kubernetes Operator的Application模式下，Operator会根据作业的总任务槽需求来动态请求TaskManager Pods。如果作业的实际并行度（特别是受到程序中
-
-args.parallelism或SlotSharingGroup配置的影响）所需的总任务槽数量，超过了taskManager.replicas * taskmanager.numberOfTaskSlots所能提供的总任务槽数，Operator为了满足作业的任务槽需求，会弹性地启动额外的TaskManager Pods。这意味着用户不能仅依赖taskManager.replicas来确定最终的TaskManager数量，而需要结合作业的实际并行度需求和taskmanager.numberOfTaskSlots来理解其动态行为。taskManager.replicas更像是一个“初始”或“最小”的TaskManager数量，Flink运行时在K8s上具有一定的弹性扩容能力，这对于K8s集群的资源规划至关重要，因为实际Pod数量可能超出用户的初步预期。
+taskManager.replicas是Flink官网关于作业并行度配置的说明中列出的一个配置项 。它控制着Flink集群中TaskManager Pods的数量。在Kubernetes环境中，每个TaskManager Pod通常对应一个或多个物理节点上的计算实例，因此它是Kubernetes层面控制计算资源实例数量的关键参数。 然而，通过测试观察发现，taskManager.replicas并非TaskManager数量的硬性上限。例如，在测试1中，尽管YAML配置中taskManager.replicas设置为1，但实际启动了2个TaskManager。类似地，在测试6中， taskManager.replicas也设置为1，但实际启动了4个TaskManager 。这种现象表明，在Flink Kubernetes Operator的Application模式下，Operator会根据作业的总任务槽需求来动态请求TaskManager Pods。如果作业的实际并行度（特别是受到程序中args.parallelism或SlotSharingGroup配置的影响）所需的总任务槽数量，超过了taskManager.replicas * taskmanager.numberOfTaskSlots所能提供的总任务槽数，Operator为了满足作业的任务槽需求，会弹性地启动额外的TaskManager Pods。这意味着用户不能仅依赖taskManager.replicas来确定最终的TaskManager数量，而需要结合作业的实际并行度需求和taskmanager.numberOfTaskSlots来理解其动态行为。taskManager.replicas更像是一个“初始”或“最小”的TaskManager数量，Flink运行时在K8s上具有一定的弹性扩容能力，这对于K8s集群的资源规划至关重要，因为实际Pod数量可能超出用户的初步预期。
 
 ### taskmanager.numberOfTaskSlots
 
@@ -45,35 +39,19 @@ taskmanager.numberOfTaskSlots同样是Flink官网关于作业并行度配置的�
 
 ### job.parallelism
 
-job.parallelism是Flink作业的全局默认并行度设置，通常用于指定整个作业的默认并行度 。然而，测试结论明确指出，此配置项“不起作业，可以忽略” 。在所有测试案例中，无论
-
-job.parallelism设置为1还是10，其对最终的“任务并行度”都没有直接影响。这与Flink的传统行为（job.parallelism通常是重要的全局控制参数）存在显著差异。在Flink Kubernetes Operator的Application模式下，Operator更直接地管理TaskManager Pods及其任务槽分配，并可能将JobGraph的并行度与Kubernetes资源配置（如taskManager.replicas和taskmanager.numberOfTaskSlots）紧密绑定。job.parallelism可能在这个资源协调和调度逻辑中被忽略或优先级较低，导致其在实际运行时无法生效。对于习惯于传统Flink部署模式的用户来说，这是一个重要的配置陷阱。在Flink on K8s环境中，应将注意力从job.parallelism转移到更底层的TaskManager和任务槽配置，以及程序层面的算子并行度。
+job.parallelism是Flink作业的全局默认并行度设置，通常用于指定整个作业的默认并行度 。然而，测试结论明确指出，此配置项“不起作业，可以忽略” 。在所有测试案例中，无论job.parallelism设置为1还是10，其对最终的“任务并行度”都没有直接影响。这与Flink的传统行为（job.parallelism通常是重要的全局控制参数）存在显著差异。在Flink Kubernetes Operator的Application模式下，Operator更直接地管理TaskManager Pods及其任务槽分配，并可能将JobGraph的并行度与Kubernetes资源配置（如taskManager.replicas和taskmanager.numberOfTaskSlots）紧密绑定。job.parallelism可能在这个资源协调和调度逻辑中被忽略或优先级较低，导致其在实际运行时无法生效。对于习惯于传统Flink部署模式的用户来说，这是一个重要的配置陷阱。在Flink on K8s环境中，应将注意力从job.parallelism转移到更底层的TaskManager和任务槽配置，以及程序层面的算子并行度。
 
 ### args.parallelism (程序内算子并行度)
 
-args.parallelism指的是在Flink程序代码中，通过setParallelism()方法为特定算子（Operator）设置的并行度 。在本文的测试案例中，Kafka Source的并行度就是通过程序参数args.parallelism动态传入并设置的。
-
-在测试4、测试5和测试6中，当args.parallelism被设置时，最终的“任务并行度”会直接受到其影响，甚至在某些情况下（如测试4的Max(5,4)/2，测试6的Max(10,5)/2）显示为args.parallelism的值或其与集群默认并行度的最大值。测试结论也明确指出“这些算子的并行度为args.parallelism” 。这表明
-
-args.parallelism具有最高的优先级，可以覆盖集群层面的默认并行度设置。Flink的并行度解析遵循一个明确的层级结构：算子级别（setParallelism()）>作业级别（job.parallelism，此处被忽略）>集群级别（由taskManager.replicas和taskmanager.numberOfTaskSlots决定）。当算子明确设置了并行度时，它将尝试获取相应数量的任务槽来满足其并行度需求。如果集群提供的总任务槽不足以满足所有算子的并行度需求，Flink会动态请求更多的TaskManager Pods（如前述对taskManager.replicas的分析所示），以尝试满足这个更高的并行度要求。args.parallelism提供了精细化控制作业中特定算子并行度的能力，这对于优化作业瓶颈、匹配上游数据源分区数（如Kafka topic分区）或满足特定性能要求非常有用。但同时，它也可能成为隐式触发TaskManager扩容的因素，导致资源消耗超出预期。因此，在设置时需要综合考虑集群的任务槽承载能力和Kubernetes集群的资源限制。
+args.parallelism指的是在Flink程序代码中，通过setParallelism()方法为特定算子（Operator）设置的并行度 。在本文的测试案例中，Kafka Source的并行度就是通过程序参数args.parallelism动态传入并设置的。 在测试4、测试5和测试6中，当args.parallelism被设置时，最终的“任务并行度”会直接受到其影响，甚至在某些情况下（如测试4的Max(5,4)/2，测试6的Max(10,5)/2）显示为args.parallelism的值或其与集群默认并行度的最大值。测试结论也明确指出“这些算子的并行度为args.parallelism” 。这表明args.parallelism具有最高的优先级，可以覆盖集群层面的默认并行度设置。Flink的并行度解析遵循一个明确的层级结构：算子级别（setParallelism()）>作业级别（job.parallelism，此处被忽略）>集群级别（由taskManager.replicas和taskmanager.numberOfTaskSlots决定）。当算子明确设置了并行度时，它将尝试获取相应数量的任务槽来满足其并行度需求。如果集群提供的总任务槽不足以满足所有算子的并行度需求，Flink会动态请求更多的TaskManager Pods（如前述对taskManager.replicas的分析所示），以尝试满足这个更高的并行度要求。args.parallelism提供了精细化控制作业中特定算子并行度的能力，这对于优化作业瓶颈、匹配上游数据源分区数（如Kafka topic分区）或满足特定性能要求非常有用。但同时，它也可能成为隐式触发TaskManager扩容的因素，导致资源消耗超出预期。因此，在设置时需要综合考虑集群的任务槽承载能力和Kubernetes集群的资源限制。
 
 ### SlotSharingGroup
 
-SlotSharingGroup是Flink中用于控制算子是否共享同一个任务槽的机制 。归属同一个
-
-SlotSharingGroup的算子可以共享一个任务槽，而归属不同SlotSharingGroup的算子则会强制占用不同的任务槽。在测试程序中，Kafka Source被设置为slotSharingGroup("slotGroup-" + i)，这意味着不同的Kafka Topic Source实例将被分配到不同的任务槽中，而不是共享 。
-
-测试程序中明确使用了slotSharingGroup来隔离不同的Kafka Source，这意味着即使在同一个TaskManager内有空闲任务槽，不同SlotSharingGroup的算子也不会共享，从而增加了总的任务槽消耗。SlotSharingGroup允许开发者在逻辑上将算子分组，从而影响物理任务槽的分配。通过将不同Source设置到不同的SlotSharingGroup，可以确保每个Source实例都拥有独立的任务槽，避免资源争抢和相互影响，尤其是在处理多主题或多数据源的场景下。这种隔离性虽然会增加总的任务槽消耗，但可以提高作业的稳定性和可预测性，特别是在处理高并发或有严格SLA要求的场景。因此，SlotSharingGroup是优化资源利用和任务隔离的重要工具。合理使用它可以避免不必要的任务槽共享导致性能下降，或者强制任务槽隔离以提高稳定性。
+SlotSharingGroup是Flink中用于控制算子是否共享同一个任务槽的机制 。归属同一个SlotSharingGroup的算子可以共享一个任务槽，而归属不同SlotSharingGroup的算子则会强制占用不同的任务槽。在测试程序中，Kafka Source被设置为slotSharingGroup("slotGroup-" + i)，这意味着不同的Kafka Topic Source实例将被分配到不同的任务槽中，而不是共享 。测试程序中明确使用了slotSharingGroup来隔离不同的Kafka Source，这意味着即使在同一个TaskManager内有空闲任务槽，不同SlotSharingGroup的算子也不会共享，从而增加了总的任务槽消耗。SlotSharingGroup允许开发者在逻辑上将算子分组，从而影响物理任务槽的分配。通过将不同Source设置到不同的SlotSharingGroup，可以确保每个Source实例都拥有独立的任务槽，避免资源争抢和相互影响，尤其是在处理多主题或多数据源的场景下。这种隔离性虽然会增加总的任务槽消耗，但可以提高作业的稳定性和可预测性，特别是在处理高并发或有严格SLA要求的场景。因此，SlotSharingGroup是优化资源利用和任务隔离的重要工具。合理使用它可以避免不必要的任务槽共享导致性能下降，或者强制任务槽隔离以提高稳定性。
 
 ## 并行度配置测试案例与结果分析
 
-本次测试基于Flink 1.13.6版本，部署在Kubernetes集群上，采用Flink Kubernetes Operator的Application模式。测试程序ParallelismTest是一个典型的Flink流处理作业，它从多个Kafka Topic（topic-1, topic-2）消费数据，进行WordCount处理，并将结果写入MySQL 。程序中Kafka Source通过
-
-args.parallelism动态设置并行度，并且为每个Kafka Source实例设置了独立的slotSharingGroup，以确保它们不共享任务槽 。
-
-MyKafkaProducer用于向Kafka Topic生成测试数据 。
-
-为了更直观地展示不同配置组合下的实际运行效果，以下表格汇总了所有测试案例的配置参数和实际运行结果：
+本次测试基于Flink 1.13.6版本，部署在Kubernetes集群上，采用Flink Kubernetes Operator的Application模式。测试程序ParallelismTest是一个典型的Flink流处理作业，它从多个Kafka Topic（topic-1, topic-2）消费数据，进行WordCount处理，并将结果写入MySQL 。程序中Kafka Source通过args.parallelism动态设置并行度，并且为每个Kafka Source实例设置了独立的slotSharingGroup，以确保它们不共享任务槽 。 MyKafkaProducer用于向Kafka Topic生成测试数据 。 为了更直观地展示不同配置组合下的实际运行效果，以下表格汇总了所有测试案例的配置参数和实际运行结果：
 
 ### Flink on K8s并行度配置测试结果汇总
 
@@ -96,11 +74,7 @@ MyKafkaProducer用于向Kafka Topic生成测试数据 。
 taskManager.replicas=1, taskmanager.numberOfTaskSlots=6, job.parallelism=10, args.parallelism=0
 ```
 
-分析： 尽管YAML中配置taskManager.replicas为1，但为了满足作业需求（两个Kafka Source实例因SlotSharingGroup而需要独立任务槽），实际启动了2个TaskManager 。
-
-job.parallelism=10被忽略，对实际并行度没有影响 。实际任务并行度为6，总任务槽数12个全部被消耗 。这表明在没有程序内算子并行度设置时，
-
-taskmanager.numberOfTaskSlots是决定整体并行度的关键因素。
+分析： 尽管YAML中配置taskManager.replicas为1，但为了满足作业需求（两个Kafka Source实例因SlotSharingGroup而需要独立任务槽），实际启动了2个TaskManager 。 job.parallelism=10被忽略，对实际并行度没有影响 。实际任务并行度为6，总任务槽数12个全部被消耗 。这表明在没有程序内算子并行度设置时，taskmanager.numberOfTaskSlots是决定整体并行度的关键因素。
 
 #### 测试2
 
@@ -152,9 +126,7 @@ taskManager.replicas=1, taskmanager.numberOfTaskSlots=5, job.parallelism=1, args
 
 #### 结论2：taskManager.replicas的默认行为及对TaskManager数量的影响
 
-如果在作业的YAML配置文件中没有显式设置taskManager.replicas，其值可以理解为默认的1 。然而，测试也揭示了
-
-taskManager.replicas并非TaskManager数量的严格上限。Flink运行时会根据作业的实际任务槽需求（特别是当args.parallelism或SlotSharingGroup导致更高任务槽需求时）动态请求更多的TaskManager Pods，从而可能导致实际启动的TaskManager数量超过配置值。
+如果在作业的YAML配置文件中没有显式设置taskManager.replicas，其值可以理解为默认的1 。然而，测试也揭示了taskManager.replicas并非TaskManager数量的严格上限。Flink运行时会根据作业的实际任务槽需求（特别是当args.parallelism或SlotSharingGroup导致更高任务槽需求时）动态请求更多的TaskManager Pods，从而可能导致实际启动的TaskManager数量超过配置值。
 
 #### 结论3：在程序未设置算子并行度时，整体并行度如何由taskManager.replicas和taskmanager.numberOfTaskSlots共同决定
 
@@ -166,9 +138,7 @@ taskManager.replicas并非TaskManager数量的严格上限。Flink运行时会�
 
 #### 结论4：当程序层面设置了算子并行度时，其与集群配置的交互逻辑
 
-如果作业在程序层面对某些算子设置了并行度（例如本示例中的args.parallelism），那么这些算子的并行度将由args.parallelism决定，优先级最高。其他没有设置并行度的算子，其并行度仍将由集群配置（即
-
-taskManager.replicas * taskmanager.numberOfTaskSlots）决定 。测试4、5、6清晰地展示了args.parallelism如何覆盖默认并行度，并可能导致TaskManager的动态扩容以满足更高的算子并行度需求。
+如果作业在程序层面对某些算子设置了并行度（例如本示例中的args.parallelism），那么这些算子的并行度将由args.parallelism决定，优先级最高。其他没有设置并行度的算子，其并行度仍将由集群配置（即taskManager.replicas * taskmanager.numberOfTaskSlots）决定 。测试4、5、6清晰地展示了args.parallelism如何覆盖默认并行度，并可能导致TaskManager的动态扩容以满足更高的算子并行度需求。
 
 ## TaskManager部署策略：少TaskManager多Slot vs 多TaskManager少Slot
 
@@ -228,15 +198,11 @@ taskManager.replicas * taskmanager.numberOfTaskSlots）决定 。测试4、5、6
 
 ### TaskManager数量控制：强烈建议将taskManager.replicas设置为1
 
-这是本文最核心的生产建议之一。为了控制Flink作业的TaskManager数量，避免TaskManager数量爆炸导致Kubernetes异常，建议始终将taskManager.replicas设置为1。通过将
-
-taskManager.replicas固定为1，可以有效避免在作业并行度需求较高时，Flink Kubernetes Operator动态创建过多的TaskManager Pods，从而导致Kubernetes集群过载、调度效率下降甚至异常。这种策略强制采用“少TaskManager多Slot”模式，最大化单个TaskManager的资源利用率。
+这是本文最核心的生产建议之一。为了控制Flink作业的TaskManager数量，避免TaskManager数量爆炸导致Kubernetes异常，建议始终将taskManager.replicas设置为1。通过将taskManager.replicas固定为1，可以有效避免在作业并行度需求较高时，Flink Kubernetes Operator动态创建过多的TaskManager Pods，从而导致Kubernetes集群过载、调度效率下降甚至异常。这种策略强制采用“少TaskManager多Slot”模式，最大化单个TaskManager的资源利用率。
 
 ### 任务槽数量调整：根据作业实际需求，灵活调整taskmanager.numberOfTaskSlots
 
-在taskManager.replicas=1的前提下，taskmanager.numberOfTaskSlots成为主要控制作业并行度的参数。根据作业的实际吞吐量、延迟要求和算子特性（如Kafka Source的分区数、KeyBy后的数据倾斜情况）来估算所需的总任务槽数 。例如，如果作业需要100个任务槽，可以考虑将
-
-taskmanager.numberOfTaskSlots设置为10或20，这样总的TaskManager数量（即使动态扩容）也能控制在合理范围内 。
+在taskManager.replicas=1的前提下，taskmanager.numberOfTaskSlots成为主要控制作业并行度的参数。根据作业的实际吞吐量、延迟要求和算子特性（如Kafka Source的分区数、KeyBy后的数据倾斜情况）来估算所需的总任务槽数 。例如，如果作业需要100个任务槽，可以考虑将taskmanager.numberOfTaskSlots设置为10或20，这样总的TaskManager数量（即使动态扩容）也能控制在合理范围内 。
 
 ### 任务槽与CPU配比：给出taskmanager.numberOfTaskSlots与TaskManager CPU数量的合理配比建议
 
