@@ -181,7 +181,6 @@ taskManager.replicas=1, taskmanager.numberOfTaskSlots=5, job.parallelism=1, args
 
 ### 结合生产实践的策略选择
 
-'
 文档的“建议”部分明确推荐“建议始终将taskManager.replicas设置为1，根据作业实际的任务槽需求数量调大或调小taskmanager.numberOfTaskSlots”。这与“少TaskManager多Slot”策略高度一致。
 
 在Kubernetes这种资源共享且Pod管理存在开销的环境下，为了集群的整体稳定性和资源效率，通常更推荐“少TaskManager多Slot”策略。Kubernetes中，Pod是基本的调度和管理单元。大量的Pod会给API Server、Scheduler、Kubelet带来显著的额外负担，可能导致Kubernetes自身的运维复杂度和资源消耗增加。将更多任务槽集中在少数TaskManager中，可以更好地摊销Flink TaskManager的JVM启动、公共库加载等固定开销，提高整体资源利用率，从而降低成本。尽管Flink内部有高效的网络传输机制，但减少TaskManager间的网络通信节点数量，通常能降低整体网络延迟和带宽消耗，尤其对于数据量大的Shuffle操作。此外，这种策略也契合“单一职责小作业原则”，即使是“小作业”，如果其并行度需求较高，通过“少TaskManager多Slot”也能在少量TaskManager内满足，避免TaskManger数量爆炸。对于大型作业，这种策略更是控制Kubernetes Pod数量的关键。
