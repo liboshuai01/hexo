@@ -80,7 +80,6 @@ server {
 # 作用：处理所有 HTTPS 请求
 server {
     listen 443 ssl http2; # 开启 ssl 和 http2
-    listen [::]:443 ssl http2; # 兼容 IPv6
     server_name your_domain.com; # 替换成你的域名
 
     # --- SSL 核心配置 ---
