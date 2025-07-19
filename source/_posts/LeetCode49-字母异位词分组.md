@@ -3,7 +3,7 @@ title: LeetCode49-字母异位词分组
 tags:
   - 算法
   - LeetCode
-  - 哈希表
+  - 哈希
 categories:
   - 算法
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250719143206741.png'

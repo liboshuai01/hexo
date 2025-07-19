@@ -3,7 +3,7 @@ title: LeetCode128-最长连续序列
 tags:
   - 算法
   - LeetCode
-  - 哈希表
+  - 哈希
 categories:
   - 算法
 cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250719142259466.png'
