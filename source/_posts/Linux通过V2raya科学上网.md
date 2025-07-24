@@ -25,7 +25,7 @@ date: 2023-10-14 22:00:10
 ```shell
 curl -o install_v2ray.sh https://lbs-install.oss-cn-shanghai.aliyuncs.com/v2raya/install_v2ray.sh
 bash ./install_v2ray.sh
-curl -o installer_redhat_x64_2.2.5.8.rpm https://gh-proxy.com/github.com/v2rayA/v2rayA/releases/download/v2.2.5.8/installer_redhat_x64_2.2.5.8.rpm
+curl -o installer_redhat_x64_2.2.5.8.rpm https://ghfast.top/github.com/v2rayA/v2rayA/releases/download/v2.2.5.8/installer_redhat_x64_2.2.5.8.rpm
 sudo rpm -i installer_redhat_x64_2.2.5.8.rpm
 sudo systemctl enable v2raya && sudo systemctl start v2raya
 ```
@@ -39,7 +39,7 @@ sudo systemctl enable v2raya && sudo systemctl start v2raya
 
 2. 登录服务器，执行`vim install.sh`命令，粘贴内容
 
-3. 定位到294行，将这里的链接复制到`https://gh-proxy.com/`中，进行下载，然后获取新的下载地址，最后用新的下载地址替换之前的。
+3. 定位到294行，将这里的链接复制到`https://ghfast.top/`中，进行下载，然后获取新的下载地址，最后用新的下载地址替换之前的。
    ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130126293.png)
 
 4. 使用root用户执行bash install.sh命令，进行v2ray的安装
@@ -55,7 +55,7 @@ sudo systemctl enable v2raya && sudo systemctl start v2raya
 > 保证2017端口没有被占用
 
 1. 执行命令下载安装包
-   这里同理，需要到github下载加速网站`https://gh-proxy.com/`中获取新的下载地址
+   这里同理，需要到github下载加速网站`https://ghfast.top/`中获取新的下载地址
    - redhat系列：`https://github.com/v2rayA/v2rayA/releases/download/v2.2.5.8/installer_redhat_x64_2.2.5.8.rpm`
    - arch系列：`https://github.com/v2rayA/v2rayA/releases/download/v2.2.5.8/installer_archlinux_x64_2.2.5.8.pkg.tar.zst`
    - debain系列：`https://github.com/v2rayA/v2rayA/releases/download/v2.2.5.8/installer_debian_x64_2.2.5.8.deb`
