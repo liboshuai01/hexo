@@ -105,11 +105,16 @@ server {
     
     # 场景二：作为反向代理 (例如 Spring Boot, Node.js, Python后端应用)
     # location / {
-    #     proxy_pass http://127.0.0.1:8080; # 代理到你后端应用的地址
-    #     proxy_set_header Host $host;
-    #     proxy_set_header X-Real-IP $remote_addr;
-    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     proxy_pass http://127.0.0.1:13000; # 代理到你后端应用的地址
+    #     proxy_buffering off;                  # 禁用缓冲，并发大的场景慎用
+    #
+    #     proxy_set_header   X-Real-IP        $remote_addr;
+    #     proxy_set_header   Host             $http_host;
+    #     proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    #     proxy_set_header   X-Forwarded-Proto  $scheme;
+    #     proxy_set_header   Upgrade            $http_upgrade;
+    #     proxy_set_header   Connection         "upgrade";
+    #
     # }
 
     # --- 错误页面配置 ---
