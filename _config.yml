@@ -110,5 +110,5 @@ theme: butterfly
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: 'git'
-  repo: ssh://root@lbs.wiki:22222/root/document/hexo.git
+  repo: ssh://lbs@101.126.20.73:22/home/lbs/document/hexo.git
   branch: master
