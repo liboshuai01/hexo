@@ -261,7 +261,7 @@ footer:
   owner:
     enable: true
     since: 2022
-  custom_text:
+  custom_text: 豫ICP备2025118913号
   # Copyright of theme and framework
   copyright: true
 
