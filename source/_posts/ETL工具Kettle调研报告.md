@@ -1,16 +1,14 @@
 ---
 title: ETL工具Kettle调研报告
+abbrlink: e3a68637
+date: '2024-08-01T02:01:07.000Z'
 tags:
-  - Linux
-  - Kettle
-  - Elt
+  - 大数据
 categories:
   - 大数据
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504260203293.png'
 toc: true
-abbrlink: e3a68637
-date: 2024-08-01 02:01:07
 ---
+
 
 Kettle，全称为 Pentaho Data Integration（PDI），是一个开源的 ETL（Extract, Transform, Load，提取、转换、加载）工具。Kettle 最早由 Matt Casters 在 2001 年创建，最初只是一个用于数据集成的小工具。2006 年，Pentaho 公司收购了 Kettle，并将其整合为 Pentaho BI Suite 的一部分，正式更名为 Pentaho Data Integration。Kettle 以其灵活的图形界面和强大的数据处理能力而闻名，支持多种数据源和目标，并提供丰富的插件来扩展其功能。该工具适用于数据迁移、数据仓库构建和数据清洗等场景，是企业级数据集成解决方案的理想选择。
 

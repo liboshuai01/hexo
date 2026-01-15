@@ -1,16 +1,14 @@
 ---
 title: Rainbond在线快速一键安装K8s集群实战指南
+abbrlink: 45248e98
+date: '2024-04-14T11:02:41.000Z'
 tags:
-  - 环境搭建
-  - Linux
-  - k8s
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425110426306.png'
 toc: true
-abbrlink: '45248e98'
-date: 2024-04-14 11:02:41
 ---
+
 
 新人学习k8s最难的第一步就是安装k8s集群，笔者为了找到一个省心省力的安装方式也是煞费苦心。前前后后使用过`kubeadm`、`kubekey`、
 `rancher`等方式，但是无不一存在的大大小小的坑, 属实让我吃了不少的罪。但是今天介绍的[Rainbond](https://www.rainbond.com/)

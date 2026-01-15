@@ -1,16 +1,14 @@
 ---
 title: CentOS7完全卸载Docker全攻略
+abbrlink: b612e990
+date: '2023-12-02T11:21:12.000Z'
 tags:
-  - Linux
-  - Centos
-  - Docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250423112212150.png'
 toc: true
-abbrlink: b612e990
-date: 2023-12-02 11:21:12
 ---
+
 
 Docker 已成为现代云原生架构的核心组件，但在某些情况下，比如需要重新安装 Docker、升级版本或切换到其他容器管理工具时，彻底卸载 Docker 并清理相关数据成为必要步骤。本文将针对 CentOS 7 操作系统，详细梳理并扩展 Docker 卸载的完整流程，确保系统环境干净无残留。
 

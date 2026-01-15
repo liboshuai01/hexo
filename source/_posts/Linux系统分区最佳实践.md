@@ -1,14 +1,14 @@
 ---
 title: Linux系统分区最佳实践
+abbrlink: 7fd9de22
+date: '2024-02-23T17:52:48.000Z'
 tags:
-  - Linux
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250424175438843.png'
 toc: true
-abbrlink: 7fd9de22
-date: 2024-02-23 17:52:48
 ---
+
 
 在配置新的 Linux 系统时，合理的分区策略对系统性能、稳定性和维护效率有着重要影响。根据不同的应用场景和需求，选择合适的分区方案能够优化磁盘空间利用，提升系统安全性，并简化日常运维工作。本文基于一台硬盘容量为 200GB、内存为 12GB 的机器，介绍两种常用的分区设计方案：简化分区方案和完整分区方案。
 

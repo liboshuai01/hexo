@@ -1,15 +1,14 @@
 ---
 title: 一文掌握CentOS服务器硬件和状态查询命令
+abbrlink: 8a663581
+date: '2023-12-07T23:37:24.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504232339386.png'
 toc: true
-abbrlink: 8a663581
-date: 2023-12-07 23:37:24
 ---
+
 
 在管理 CentOS 服务器过程中，快速准确获取硬件配置和系统运行状态是运维人员的基础技能。合理使用系统自带和常用工具，能帮助快速定位问题、评估服务器性能和优化资源使用。
 

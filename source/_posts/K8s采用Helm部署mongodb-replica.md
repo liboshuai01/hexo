@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署mongodb-replica
 abbrlink: 9d2481ad
-date: 2025-06-11 19:28:16
+date: '2025-06-11T19:28:16.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Mongodb
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250611193125733.png'
 toc: true
 ---
+
 
 在现代云原生架构中，将有状态应用（如数据库）容器化并部署在 Kubernetes 上已成为主流趋势。这不仅能带来高可用性、弹性伸缩的优势，还能统一应用的运维管理模式。MongoDB 作为业界领先的 NoSQL 数据库，其副本集（Replica Set）模式是保障数据冗余和高可用的生产标准。
 

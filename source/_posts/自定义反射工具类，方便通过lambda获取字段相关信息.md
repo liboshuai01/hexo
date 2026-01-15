@@ -1,14 +1,14 @@
 ---
 title: 自定义反射工具类，方便通过lambda获取字段相关信息
+abbrlink: 6e0a2623
+date: '2024-08-19T10:28:51.000Z'
 tags:
   - Java
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261030763.png'
 toc: true
-abbrlink: 6e0a2623
-date: 2024-08-19 10:28:51
 ---
+
 
 Java反射是开发中不可或缺的强大工具，它允许我们在运行时动态检查、访问以及操作类、方法和字段。然而，直接使用反射往往导致代码冗长且难以维护。如何简化反射操作，让代码更加优雅且易于使用？本文将介绍一个名为`ReflectUtils`的实用工具类，它巧妙结合Java反射机制和Lambda表达式，为字段的访问和修改提供了简洁、高效的解决方案。
 

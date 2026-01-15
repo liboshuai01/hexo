@@ -1,17 +1,14 @@
 ---
 title: WireGuard + frp 搭建安全高效的远程开发环境
+abbrlink: ef27da93
+date: '2025-05-05T01:24:11.000Z'
 tags:
-  - Linux
-  - WireGuard
-  - Frp
-  - Vpn
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505042344955.png'
 toc: true
-abbrlink: ef27da93
-date: 2025-05-05 01:24:11
 ---
+
 
 作为一名开发者，你是否经常遇到这样的痛点：家里的开发测试环境（如虚拟机集群、NAS）资源丰富，但一旦离开家（比如去公司或出差），就无法访问这些宝贵的内网资源？本文将详细介绍如何利用现代 VPN 解决方案 WireGuard 和内网穿透工具 frp，搭建一个安全、高效、稳定的远程访问通道，让你随时随地都能连接到家庭或办公室的内部网络，如同身处局域网之中。
 

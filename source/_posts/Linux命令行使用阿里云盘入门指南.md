@@ -1,14 +1,14 @@
 ---
 title: Linux命令行使用阿里云盘入门指南
+abbrlink: 8cf8c083
+date: '2024-03-25T21:50:40.000Z'
 tags:
-  - Linux
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504242151778.png'
 toc: true
-abbrlink: 8cf8c083
-date: 2024-03-25 21:50:40
 ---
+
 
 阿里云盘CLI是一款基于命令行的阿里云盘客户端，模拟了Linux Shell中的文件处理命令，极大地方便了Linux用户进行云端文件管理。它不仅支持交互式命令操作，还具备JavaScript插件扩展能力，支持同步备份及批量下载相册等实用功能，是阿里云盘用户的高效工具。
 

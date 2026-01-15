@@ -1,15 +1,14 @@
 ---
 title: 离线环境下CentOS7安装GCC指南
+abbrlink: 1b133638
+date: '2023-12-08T00:01:04.000Z'
 tags:
-  - Linux
-  - GCC
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504200009167.png'
 toc: true
-abbrlink: 1b133638
-date: 2023-12-08 00:01:04
 ---
+
 
 在CentOS 7环境中，默认安装的GCC版本是4.8.5。有时因网络限制或公司安全策略，需要在无互联网连接的环境下进行GCC的安装。本文将聚焦于**离线环境下快速安装GCC 4.8.5版本**的实操步骤，保证安装过程简单快捷，适合拥有`root`权限或免密`root`权限的用户使用。
 

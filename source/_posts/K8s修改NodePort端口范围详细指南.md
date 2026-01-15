@@ -1,15 +1,14 @@
 ---
 title: K8s修改NodePort端口范围详细指南
+abbrlink: a70eb909
+date: '2024-03-28T10:24:22.000Z'
 tags:
-  - Linux
-  - K8s
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425102631839.png'
 toc: true
-abbrlink: a70eb909
-date: 2024-03-28 10:24:22
 ---
+
 
 在 Kubernetes 集群中，NodePort 是一种常用的 Service 类型，默认分配的端口范围是 30000-32767。这一范围在某些企业网络环境下可能存在限制，导致无法使用默认端口。本文将详细介绍如何修改 Kubernetes 默认 NodePort 端口范围，以满足不同网络策略和安全需求。
 

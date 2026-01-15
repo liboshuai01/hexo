@@ -1,17 +1,14 @@
 ---
 title: Linux系统压力测试实战指南
+abbrlink: c0874e0d
+date: '2025-07-07T10:02:03.000Z'
 tags:
-  - Linux
-  - stress-ng
-  - 压力测试
-  - 性能测试
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250707100321838.png'
 toc: true
-abbrlink: c0874e0d
-date: 2025-07-07 10:02:03
 ---
+
 
 在系统调优、应用部署或硬件评估时，了解一个系统在极限负载下的表现至关重要。压力测试（Stress Testing）正是为此而生，它可以帮助我们发现性能瓶颈、验证系统稳定性、评估散热效率，并为容量规划提供数据支持。
 

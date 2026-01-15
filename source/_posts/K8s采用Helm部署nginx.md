@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署nginx
+abbrlink: fdb2064a
+date: '2025-06-12T03:30:40.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Nginx
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250612033146788.png'
 toc: true
-abbrlink: fdb2064a
-date: 2025-06-12 03:30:40
 ---
+
 
 在云原生时代，Kubernetes (K8s) 已成为容器编排的事实标准，而Nginx作为高性能的反向代理和Web服务器，是K8s生态中最常部署的应用之一。直接编写和管理K8s的YAML清单文件可能变得复杂和繁琐，尤其是在涉及多环境配置、应用更新和依赖管理时。
 

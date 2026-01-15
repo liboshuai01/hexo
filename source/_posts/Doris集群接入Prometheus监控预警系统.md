@@ -1,16 +1,14 @@
 ---
 title: Doris集群接入Prometheus监控预警系统
+abbrlink: cb9ef302
+date: '2024-04-28T14:32:30.000Z'
 tags:
-  - Linux
-  - Kafka
-  - Prometheus
+  - 监控预警
 categories:
   - 监控预警
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425143333683.png'
 toc: true
-abbrlink: cb9ef302
-date: 2024-04-28 14:32:30
 ---
+
 
 在本文中，我们将详细探讨如何将 Doris 集群与 Prometheus 和 Grafana 监控系统集成。通过对这些技术的整合，我们可以实现对 Doris 集群的实时监控，从而有效地监控集群的性能和健康状态。此外，通过图形化的监控界面，我们能更直观地理解和分析数据，对于维护和优化集群运行至关重要。
 

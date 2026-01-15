@@ -1,16 +1,14 @@
 ---
 title: LeetCode128-最长连续序列
+abbrlink: 3f27087f
+date: '2025-07-19T14:23:47.000Z'
 tags:
   - 算法
-  - LeetCode
-  - 哈希
 categories:
   - 算法
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250719142259466.png'
 toc: true
-abbrlink: 3f27087f
-date: 2025-07-19 14:23:47
 ---
+
 
 ## 题目
 

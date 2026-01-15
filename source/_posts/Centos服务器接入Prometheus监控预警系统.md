@@ -1,16 +1,14 @@
 ---
 title: Centos服务器接入Prometheus监控预警系统
+abbrlink: c49f934d
+date: '2024-04-23T14:21:37.000Z'
 tags:
-  - Linux
-  - Docker
-  - Prometheus
+  - 监控预警
 categories:
   - 监控预警
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425142250834.png'
 toc: true
-abbrlink: c49f934d
-date: 2024-04-23 14:21:37
 ---
+
 
 在这篇技术博文中，我将详细介绍如何在 CentOS 系统上安装和配置 Prometheus 的一个重要组件 —— `node_exporter`。`node_exporter` 负责收集主机级别的性能指标，并将这些指标暴露给 Prometheus 服务器。我们还将介绍如何将这些监控数据接入到 Prometheus，并使用 Grafana 来创建一个漂亮的监控面板。
 

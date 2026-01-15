@@ -1,15 +1,14 @@
 ---
 title: 快速配置Docker镜像加速与日志管理
+abbrlink: 6c2916b8
+date: '2024-03-29T10:33:14.000Z'
 tags:
-  - Linux
-  - docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425103402457.png'
 toc: true
-abbrlink: 6c2916b8
-date: 2024-03-29 10:33:14
 ---
+
 
 Docker 是现代容器化应用的核心技术，配置合适的镜像加速器和日志管理策略，对于提升构建性能和系统稳定性至关重要。本文将指导您如何快速配置国内可用的 Docker 镜像加速器，同时优化日志文件大小与轮转，以及设置容器数据存储路径，助力打造高效且可维护的容器环境。
 

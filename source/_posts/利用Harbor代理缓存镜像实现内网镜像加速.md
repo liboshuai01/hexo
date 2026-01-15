@@ -1,16 +1,14 @@
 ---
 title: 利用Harbor代理缓存镜像实现内网镜像加速
 abbrlink: 4758ac99
-date: 2023-12-06 11:38:41
+date: '2023-12-06T11:38:41.000Z'
 tags:
-  - Linux
-  - Harbor
-  - Docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250423114058678.png'
 toc: true
 ---
+
 
 在企业内网环境中，开发者经常需要使用外网公共镜像资源。但由于网络受限或者带宽有限，直接拉取外网镜像往往效率低下甚至无法访问。为解决这一瓶颈，Harbor v2.1 引入了强大的「代理缓存」功能，帮助内网Harbor仓库智能代理并缓存外部镜像，极大提升镜像拉取效率，节省带宽，规避 Docker Hub 访问速率限制。
 

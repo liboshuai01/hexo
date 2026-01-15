@@ -1,16 +1,14 @@
 ---
 title: LeetCode1-两数之和
+abbrlink: e5d20eb8
+date: '2025-07-19T14:10:47.000Z'
 tags:
   - 算法
-  - LeetCode
-  - 哈希表
 categories:
   - 算法
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250719145604416.png'
 toc: true
-abbrlink: e5d20eb8
-date: 2025-07-19 14:10:47
 ---
+
 
 ## 题目
 

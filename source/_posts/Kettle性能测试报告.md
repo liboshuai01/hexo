@@ -1,16 +1,14 @@
 ---
 title: Kettle性能测试报告
+abbrlink: 73fd6885
+date: '2024-08-01T10:00:57.000Z'
 tags:
-  - Linux
-  - Kettle
-  - Elt
+  - 大数据
 categories:
   - 大数据
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261003635.png'
 toc: true
-abbrlink: 73fd6885
-date: 2024-08-01 10:00:57
 ---
+
 
 在大数据处理和业务系统集成中，ETL（Extract-Transform-Load）工具起着至关重要的作用。Kettle 作为一款开源且功能强大的 ETL 工具，被广泛应用于数据抽取和加载的场景中。为了更好地理解 Kettle 在不同数据源和目标环境下的性能表现，本报告针对 两个典型场景展开详细测试。通过对比 MySQL 到 MySQL 及 Excel 到 MySQL 的数据迁移流程，我们分析了 Kettle 在处理千万级数据时的运行时间和系统资源消耗。这些测试结果为实际项目中的性能优化提供了参考依据，同时也揭示了参数配置对性能的影响，为后续优化提供了思路。
 

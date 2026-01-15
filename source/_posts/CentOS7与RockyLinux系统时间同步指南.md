@@ -1,16 +1,14 @@
 ---
 title: CentOS7与RockyLinux系统时间同步指南
+abbrlink: 669fb41a
+date: '2024-04-15T11:08:07.000Z'
 tags:
-  - Linux
-  - Centos
-  - RockyLinux
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425110909439.png'
 toc: true
-abbrlink: 669fb41a
-date: 2024-04-15 11:08:07
 ---
+
 
 系统时间的准确性对于服务器的稳定运行至关重要。无论是日志记录的准确性、安全认证的时效性，还是数据库事务与分布式系统的协调，时间均扮演关键角色。本文将全面介绍如何在 CentOS 7 和 Rocky Linux 9.4 上配置时间同步方案，重点对比传统工具 `ntpdate` 与现代工具 `chrony` 的使用方法和最佳实践，助您打造高效、稳定的服务器环境。
 

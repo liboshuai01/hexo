@@ -1,15 +1,14 @@
 ---
 title: 为CentOS普通用户授予Sudo权限
+abbrlink: f4f01899
+date: '2024-03-20T21:31:04.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504242132092.png'
 toc: true
-abbrlink: f4f01899
-date: 2024-03-20 21:31:04
 ---
+
 
 在 Linux 系统管理中，`sudo` 命令是一个至关重要的工具。它允许普通用户以超级用户（root）或其他用户的身份执行特定的命令，而无需直接共享 root 密码。这种机制遵循最小权限原则，有助于提升系统的安全性。本指南将详细说明如何在 CentOS 系统上为普通用户安全地授予 `sudo` 权限。
 

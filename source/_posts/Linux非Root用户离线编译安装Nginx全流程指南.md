@@ -1,15 +1,14 @@
 ---
 title: Linux非Root用户离线编译安装Nginx全流程指南
 abbrlink: 5299bb23
-date: 2022-04-26 23:30:58
+date: '2022-04-26T23:30:58.000Z'
 tags:
-  - Linux
-  - Nginx
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504262335142.png'
 toc: true
 ---
+
 
 在Linux服务器环境中，出于安全考虑，通常使用非root用户运行服务，以降低系统风险。本文将详尽介绍如何在无root权限的环境下，通过源码离线编译方式，完成Nginx及其依赖组件的安装部署。同时，将提供解决1024以下端口权限限制的方法，帮助您搭建稳定且安全的Web服务。
 

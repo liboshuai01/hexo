@@ -1,15 +1,14 @@
 ---
 title: 非SpringBoot环境下Jedis工具操作Redis集群实战指南
+abbrlink: c2e80da6
+date: '2024-08-20T10:36:39.000Z'
 tags:
   - Java
-  - SpringBoot
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250424173823338.png'
 toc: true
-abbrlink: c2e80da6
-date: 2024-08-20 10:36:39
 ---
+
 
 在现代分布式系统中，Redis 作为高性能的内存数据存储解决方案，广泛被用于缓存、会话管理、排行榜等场景。为了满足高可用和扩展需求，Redis 集群成为首选架构。本文将聚焦于非 Spring Boot 应用环境，如何利用 Jedis 客户端来封装一个功能完备且易用的 Redis 工具类，从而简化对 Redis 集群的操作管理。
 

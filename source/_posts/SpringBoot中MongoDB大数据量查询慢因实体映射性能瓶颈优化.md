@@ -1,16 +1,14 @@
 ---
 title: SpringBoot中MongoDB大数据量查询慢因实体映射性能瓶颈优化
+abbrlink: 5e9e3754
+date: '2022-01-19T17:16:59.000Z'
 tags:
   - Java
-  - SpringBoot
-  - MongoDB
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250424171841815.png'
 toc: true
-abbrlink: 5e9e3754
-date: 2022-01-19 17:16:59
 ---
+
 
 在实际项目中，MongoDB 表数据量达到十万级别，使用 Spring Boot 结合 Spring Data MongoDB 进行查询时，发现查询结果量一万多条竟然耗时超过一分钟，严重影响系统性能。即使已合理添加索引，查询依然缓慢。经排查，瓶颈主要集中在 Spring Data 提供的原生查询接口（如 mongoTemplate.find() 或 mongoRepository）将查询结果自动映射为 Java 实体类的过程，尤其数据量较大时转换效率极低。
 

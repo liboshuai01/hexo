@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署redis-standalone
+abbrlink: fb011a6c
+date: '2025-06-11T18:48:38.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Redis
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250611185238101.png'
 toc: true
-abbrlink: fb011a6c
-date: 2025-06-11 18:48:38
 ---
+
 
 在现代微服务架构中，Redis 扮演着至关重要的角色，无论是作为高速缓存、分布式会话存储，还是消息队列，其高性能的读写能力都是后端系统不可或缺的组件。将 Redis 部署在 Kubernetes (K8s) 上，可以充分利用 K8s 的弹性伸缩、自愈和自动化管理能力。而 Helm，作为 K8s 的包管理器，则能将复杂的部署流程标准化、模板化，实现一键式部署与管理。
 

@@ -1,16 +1,14 @@
 ---
 title: 使用Docker-Compose快速部署Nginx
+abbrlink: afa7cb7f
+date: '2023-12-14T00:34:17.000Z'
 tags:
-  - Linux
-  - Centos
-  - Docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504240035780.png'
 toc: true
-abbrlink: afa7cb7f
-date: 2023-12-14 00:34:17
 ---
+
 
 在现代软件开发与部署流程中，容器化技术已成主流，Docker 和 Docker Compose 简化了应用的管理与交付。Nginx 作为轻量级高性能的 Web 服务器和反向代理，广泛应用于生产环境。本文详细介绍如何利用 `docker-compose` 快速搭建一个完整的 Nginx 容器环境，包含配置挂载、日志管理及静态资源托管，帮助您轻松实现高效部署。
 

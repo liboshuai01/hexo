@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署mongodb-sharded
 abbrlink: 4463c703
-date: 2025-06-11 19:22:50
+date: '2025-06-11T19:22:50.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Mongodb
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250611192424146.png'
 toc: true
 ---
+
 
 在构建高性能、数据驱动的后端系统时，数据库的选择与部署是至关重要的一环。MongoDB 作为一个灵活、可扩展的 NoSQL 数据库，其分片集群（Sharded Cluster）架构能够为海量数据提供出色的水平扩展能力和高可用性。然而，手动部署和管理一个完整的分片集群（包含 Config Servers, Shards, Mongos Routers）相当复杂。
 

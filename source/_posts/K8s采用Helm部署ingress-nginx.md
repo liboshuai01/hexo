@@ -1,18 +1,14 @@
 ---
 title: K8s采用Helm部署ingress-nginx
+abbrlink: ad80c258
+date: '2025-06-11T18:26:25.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Nginx
-  - Ingress-Nginx
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505061122195.png'
 toc: true
-abbrlink: ad80c258
-date: 2025-06-11 18:26:25
 ---
+
 
 在Kubernetes（K8s）生态中，`Ingress`是管理集群外部访问HTTP/S路由的核心资源。而`ingress-nginx`作为官方维护的实现，凭借其高性能和稳定性，成为了事实上的标准。本文将介绍一种生产级的、可重复的部署方式——使用Helm结合脚本，将`ingress-nginx`以`DaemonSet`的形式部署在指定节点上，并利用`hostNetwork`模式实现高效的网络通信。
 

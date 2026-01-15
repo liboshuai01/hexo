@@ -1,15 +1,14 @@
 ---
 title: CentOS系统中重置Root用户密码的完整步骤详解
+abbrlink: bbe1dc4
+date: '2024-05-15T14:45:42.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425144815357.png'
 toc: true
-abbrlink: bbe1dc4
-date: 2024-05-15 14:45:42
 ---
+
 
 在实际运维过程中，由于各种原因，可能会忘记或丢失 CentOS 系统中 root 用户的登录密码。传统方法需要借助安装介质或者复杂的恢复工具，这对于部分用户来说较为繁琐。本文将详细介绍一种简便且高效的方式，通过修改启动参数进入单用户模式，从而重新设置 root 密码，恢复对系统的完全控制权限。整个过程无需额外工具，适用于 CentOS 系统的常见版本，步骤清晰易操作，非常适合系统管理员和运维工程师参考学习。
 

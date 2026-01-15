@@ -1,16 +1,14 @@
 ---
 title: Es集群接入Prometheus监控预警系统
-tags:
-   - Linux
-   - Kafka
-   - Prometheus
-categories:
-   - 监控预警
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425143129514.png'
-toc: true
 abbrlink: d6995e86
-date: 2024-04-28 14:30:23
+date: '2024-04-28T14:30:23.000Z'
+tags:
+  - 监控预警
+categories:
+  - 监控预警
+toc: true
 ---
+
 
 在当前的云计算和大数据时代，监控系统的健康和性能变得尤为重要。本文将详细介绍如何使用`ElasticSearch`作为数据存储后端，通过`Prometheus`和`Grafana`进行有效的监控和可视化，以确保您的服务可靠性和性能优化。
 

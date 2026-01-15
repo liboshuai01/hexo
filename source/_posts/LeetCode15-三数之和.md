@@ -1,16 +1,14 @@
 ---
 title: LeetCode15-三数之和
+abbrlink: 1b6e2437
+date: '2025-07-19T16:21:03.000Z'
 tags:
   - 算法
-  - LeetCode
-  - 双指针
 categories:
   - 算法
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250719170103150.png'
 toc: true
-abbrlink: 1b6e2437
-date: 2025-07-19 16:21:03
 ---
+
 
 ## 题目
 

@@ -1,17 +1,14 @@
 ---
 title: CentOS系统在线安装docker与docker-compose实战指南
+abbrlink: 987e17e9
+date: '2024-05-15T14:51:33.000Z'
 tags:
-  - Linux
-  - Centos
-  - Docker
-  - Docker-Compose
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425145545072.png'
 toc: true
-abbrlink: 987e17e9
-date: 2024-05-15 14:51:33
 ---
+
 
 本文将详细介绍如何在 CentOS 系统中，安装指定版本的 Docker 和 Docker Compose，保证环境的稳定与兼容。文中推荐的 Docker 版本为 **25.0.5**，Docker Compose 版本为 **2.22.0**，适合生产环境使用。
 

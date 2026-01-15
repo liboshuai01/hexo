@@ -1,15 +1,14 @@
 ---
 title: RockyLinux服务器一键初始化配置脚本
+abbrlink: c8df43e1
+date: '2024-03-23T21:42:31.000Z'
 tags:
-  - Linux
-  - RockyLinux
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504242143123.png'
 toc: true
-abbrlink: c8df43e1
-date: 2024-03-23 21:42:31
 ---
+
 
 在部署全新的 RockyLinux 服务器时，系统管理员往往需要进行一系列繁琐的基础配置工作，包括设置主机名、关闭安全策略、调整系统资源限制、安装常用工具及配置 Docker 环境等。这些手动操作不仅耗时，而且容易因疏忽导致配置错误。为此，本文提供了一份一键初始化脚本，帮助您快速完成基础环境搭建，保障服务器具备稳定、高效的运行基础。
 

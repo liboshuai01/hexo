@@ -1,14 +1,14 @@
 ---
 title: Java对象映射利器MapStruct应用详解与实战指南
+abbrlink: a5d24d11
+date: '2024-12-25T13:45:54.000Z'
 tags:
   - Java
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261816759.png'
 toc: true
-abbrlink: a5d24d11
-date: 2024-12-25 13:45:54
 ---
+
 
 在日常开发中，最令人头疼的问题之一莫过于不同层对象之间的复制转换，比如前端的VO（视图对象）与后端数据库的Entity（实体）结构不一致。手写大量的`set`方法虽然性能优秀，但极其繁琐且容易出错，严重浪费开发时间。
 

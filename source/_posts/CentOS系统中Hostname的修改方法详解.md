@@ -1,15 +1,14 @@
 ---
 title: CentOS系统中Hostname的修改方法详解
+abbrlink: a06f295
+date: '2024-07-30T01:37:22.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504260138662.png'
 toc: true
-abbrlink: a06f295
-date: 2024-07-30 01:37:22
 ---
+
 
 在Linux服务器管理中，修改主机名（hostname）是常见且必要的操作。不同版本的CentOS系统，其修改主机名的方法有所区别，本文将分别介绍CentOS 6和CentOS 7中修改hostname的最佳实践，并补充详细步骤及注意事项，帮助您正确高效地完成操作。
 

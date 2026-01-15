@@ -1,19 +1,14 @@
 ---
 title: K8s采用Helm部署kube-prometheus-stack
+abbrlink: 32b0bac
+date: '2025-06-11T18:30:16.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Prometheus
-  - Grafana
-  - Alertmanager
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505262315857.png'
 toc: true
-abbrlink: 32b0bac
-date: 2025-06-11 18:30:16
 ---
+
 
 在云原生时代，对Kubernetes集群进行全面、实时的监控是确保系统稳定性和性能的关键。Prometheus凭借其强大的数据模型和查询语言，已成为监控领域的标准。`kube-prometheus-stack`项目将Prometheus、Grafana、Alertmanager以及一系列Exporter和CRD（自定义资源定义）打包在一起，提供了一套开箱即用的、与Kubernetes深度集成的监控解决方案。
 

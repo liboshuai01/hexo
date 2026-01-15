@@ -1,15 +1,14 @@
 ---
 title: CentOS7更改默认SSH端口与配置指南
 abbrlink: 53a37b46
-date: 2023-11-23 17:19:41
+date: '2023-11-23T17:19:41.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250422172025098.png'
 toc: true
 ---
+
 
 SSH（Secure Shell）是 Linux 服务器远程管理的核心工具，其默认监听端口为 22。由于端口 22 众所周知，这也使得服务器容易受到自动化扫描和暴力破解攻击。虽然更改 SSH 默认端口只是安全加固的一种辅助手段，但它能有效地降低被自动化攻击工具扫描的风险。
 

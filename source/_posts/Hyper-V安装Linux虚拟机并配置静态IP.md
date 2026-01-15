@@ -1,16 +1,14 @@
 ---
 title: Hyper-V安装Linux虚拟机并配置静态IP
+abbrlink: 64cc72c6
+date: '2025-04-13T02:07:05.000Z'
 tags:
-  - Linux
-  - Hyper-V
-  - 虚拟机
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130209784.png'
 toc: true
-abbrlink: 64cc72c6
-date: 2025-04-13 02:07:05
 ---
+
 
 本文主要介绍了如何在Hyper-V平台上安装红帽系列Linux虚拟机，并配置静态IP地址。整体流程涵盖了网络环境的初期配置、虚拟机的创建以及详细的静态IP设置步骤，使整个搭建过程清晰可循。
 

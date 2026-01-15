@@ -1,14 +1,14 @@
 ---
 title: 利用SpringAOP实现方法执行时间统计与日志记录
+abbrlink: d87c6abc
+date: '2024-08-19T10:32:14.000Z'
 tags:
   - Java
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504270008533.png'
 toc: true
-abbrlink: d87c6abc
-date: 2024-08-19 10:32:14
 ---
+
 
 在现代应用程序开发中，性能监控和日志记录是确保应用程序高效运行和便于调试的关键因素。本文将介绍如何使用Spring AOP（面向切面编程）结合自定义注解，实现对方法执行时间的统计和详细的日志记录。
 

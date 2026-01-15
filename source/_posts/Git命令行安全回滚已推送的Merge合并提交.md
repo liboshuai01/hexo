@@ -1,15 +1,14 @@
 ---
 title: Git命令行安全回滚已推送的Merge合并提交
+abbrlink: 31d08c34
+date: '2025-04-23T18:18:30.000Z'
 tags:
-  - Git
-  - Idea
+  - 杂货小铺
 categories:
   - 杂货小铺
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250423184222202.png'
 toc: true
-abbrlink: 31d08c34
-date: 2025-04-23 18:18:30
 ---
+
 
 在日常开发中，我们经常会遇到将功能分支合并（merge）到主分支后，突然因需求变更需要回滚这次合并操作的情况。尤其是在合并提交已经推送到远程仓库之后，回滚操作稍不谨慎就可能带来冲突或版本混乱。
 

@@ -1,15 +1,14 @@
 ---
 title: 浅谈Dockerfile中RUN、CMD与ENTRYPOINT
+abbrlink: 4393d8b3
+date: '2024-04-11T10:50:18.000Z'
 tags:
-  - Centos
-  - Docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425105158019.png'
 toc: true
-abbrlink: 4393d8b3
-date: 2024-04-11 10:50:18
 ---
+
 
 在容器化开发中，理解 Dockerfile 的指令至关重要，尤其是与命令执行相关的 `RUN`、`CMD` 和 `ENTRYPOINT`。它们虽关联紧密，但作用时机与目的存在本质差异。本文将详细剖析这三个指令的功能、区别及最佳实践，助力你编写高效且灵活的 Dockerfile。
 

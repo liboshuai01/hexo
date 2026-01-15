@@ -1,15 +1,14 @@
 ---
 title: Redis集群密码热更新指南
+abbrlink: c9b3bba3
+date: '2024-05-07T14:38:19.000Z'
 tags:
-  - Linux
-  - Redis
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425143958978.png'
 toc: true
-abbrlink: c9b3bba3
-date: 2024-05-07 14:38:19
 ---
+
 
 在生产环境中，Redis 集群作为高性能缓存和数据存储的核心组件，其安全性至关重要。密码认证是阻止未授权访问的重要措施之一。当需要修改 Redis 集群密码时，如果每次都重启节点，不仅工作量大，还可能导致服务不可用。幸而，Redis 支持通过命令动态修改密码，实现热更新，并能将更改持久化，确保重启后依然生效。
 

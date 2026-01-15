@@ -1,15 +1,14 @@
 ---
 title: Linux命令行使用百度云盘入门指南
+abbrlink: 4262bd57
+date: '2024-03-24T21:47:10.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504242148212.png'
 toc: true
-abbrlink: 4262bd57
-date: 2024-03-24 21:47:10
 ---
+
 
 在服务器或无图形界面的环境下使用百度网盘，传统的网页方式不够便捷。本文介绍一款基于 Linux Shell 操作风格的百度网盘命令行客户端——BaiduPCS-Go，帮助你在 CentOS 系统中实现文件的快速管理与下载，操作简单，功能丰富，适合开发者和运维人员使用。
 

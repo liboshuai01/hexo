@@ -1,15 +1,14 @@
 ---
 title: 分析合并自己分支到公共分支时是使用merge还是rebase
+abbrlink: 16bb381a
+date: '2025-01-09T22:19:00.000Z'
 tags:
-  - Git
-  - Idea
+  - 杂货小铺
 categories:
   - 杂货小铺
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504262220879.png'
 toc: true
-abbrlink: 16bb381a
-date: 2025-01-09 22:19:00
 ---
+
 
 在现代软件开发中，Git 作为主流的分布式版本控制系统，被广泛应用于团队协作和代码管理。**`git merge`** 和 **`git rebase`** 是 Git 中两种常用的分支整合方法。理解它们的区别及其各自的应用场景，对于保持代码库的整洁和高效协作至关重要。本文将深入探讨这两者的差异，并详细说明在将个人分支合并到公共 `master` 分支时，应该选择哪种方法更为合适。
 

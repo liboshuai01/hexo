@@ -1,14 +1,14 @@
 ---
 title: Maven常用命令详解与实战指南
+abbrlink: 2b7ccd05
+date: '2024-12-30T19:35:57.000Z'
 tags:
-  - Maven
+  - 杂货小铺
 categories:
   - 杂货小铺
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261937526.png'
 toc: true
-abbrlink: 2b7ccd05
-date: 2024-12-30 19:35:57
 ---
+
 
 作为Java开发者，Maven是项目构建与管理的基石工具。如何高效使用Maven命令以提升开发、测试和部署效率，是每个开发者必须掌握的核心技能。本文将系统梳理Maven的常用命令，结合实际场景深入分析其执行过程和最佳实践，助力您快速上手并灵活应用。
 

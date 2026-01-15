@@ -1,16 +1,14 @@
 ---
 title: Docker快速部署完整监控预警系统
+abbrlink: e352145d
+date: '2024-04-23T14:17:41.000Z'
 tags:
-  - Linux
-  - Docker
-  - Prometheus
+  - 监控预警
 categories:
   - 监控预警
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425141920379.png'
 toc: true
-abbrlink: e352145d
-date: 2024-04-23 14:17:41
 ---
+
 
 在本篇博文中，我们将探讨如何使用 Docker 快速部署 Prometheus 和 Grafana。Prometheus 是一个开源的监控和警报工具，而 Grafana 则是一个用于可视化监控数据的开源平台。通过结合使用这两个工具，您可以有效地监控您的 IT 基础设施，并通过美观的仪表板展示关键性能指标。
 

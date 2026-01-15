@@ -1,15 +1,14 @@
 ---
 title: Jenkins容器中如何使用Docker命令实现镜像构建
+abbrlink: aaba5ea7
+date: '2024-04-12T10:54:14.000Z'
 tags:
-  - Centos
-  - Docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425105440842.png'
 toc: true
-abbrlink: aaba5ea7
-date: 2024-04-12 10:54:14
 ---
+
 
 在基于 Jenkins 和 Docker 构建的 DevOps 流水线中，常见的需求是需要在 Jenkins 容器内部执行 Docker 命令，用于构建、打包镜像等操作。然而，由于 Jenkins 本身运行在容器中，Docker 环境也被隔离，直接调用 Docker 命令通常会失败。本文将重点介绍如何高效、安全地解决这一问题，实现容器内调用宿主机 Docker 引擎的最佳实践。
 

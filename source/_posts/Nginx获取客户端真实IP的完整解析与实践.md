@@ -1,15 +1,14 @@
 ---
 title: Nginx获取客户端真实IP的完整解析与实践
+abbrlink: 6e7192ea
+date: '2024-09-10T11:29:46.000Z'
 tags:
-  - Linux
-  - Nginx
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261131562.png'
 toc: true
-abbrlink: 6e7192ea
-date: 2024-09-10 11:29:46
 ---
+
 
 在现代生产环境中，Nginx 作为反向代理服务器被广泛应用于服务的暴露与负载均衡。尤其是在面对公网访问时，通常会在 Nginx 前端部署 CDN 或云厂商负载均衡器，以提升访问性能与安全性。如何准确获取并传递客户端的真实 IP，成为开发与运维的重要课题。
 

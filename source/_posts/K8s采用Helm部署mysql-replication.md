@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署mysql-replication
+abbrlink: e9954717
+date: '2025-06-11T18:43:46.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Mysql
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250607051028585.png'
 toc: true
-abbrlink: e9954717
-date: 2025-06-11 18:43:46
 ---
+
 
 在构建高可用、数据驱动的后端系统中，数据库的稳定性和可扩展性是基石。传统的MySQL主从复制（Replication）是保障数据冗余和读写分离的经典方案。当我们将应用迁移到云原生环境时，如何在Kubernetes上高效、可靠地部署和管理MySQL主从集群，就成了一个重要课题。
 

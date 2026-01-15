@@ -1,15 +1,14 @@
 ---
 title: CentOS离线Kubekey一键部署K8s集群指南
+abbrlink: 56f8b097
+date: '2024-03-27T21:55:15.000Z'
 tags:
-  - Linux
-  - k8s
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504242156648.png'
 toc: true
-abbrlink: 56f8b097
-date: 2024-03-27 21:55:15
 ---
+
 
 在国内网络环境复杂的情况下，直接在线安装 Kubernetes 集群常常受限、耗时且易出错。基于此，本文分享利用 [KubeKey](https://kubesphere.io/zh/docs/installing-on-linux/introduction/)，结合离线安装包，实现 CentOS 系统下一键离线部署 Kubernetes 集群的完整流程。该方案针对 Kubernetes v1.23.10、Docker 20.10.8 和 KubeSphere v3.3.2 版本进行了深度优化，支持单 Master 节点与多节点 Worker 节点部署，特别适合生产环境或网络隔离场景。
 

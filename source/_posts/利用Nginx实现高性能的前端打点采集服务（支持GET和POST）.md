@@ -1,16 +1,14 @@
 ---
 title: 利用Nginx实现高性能的前端打点采集服务（支持GET和POST）
+abbrlink: 91322bdf
+date: '2025-04-15T11:28:12.000Z'
 tags:
-  - Linux
-  - Nginx
-  - 前端
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250424112920997.png'
 toc: true
-abbrlink: 91322bdf
-date: 2025-04-15 11:28:12
 ---
+
 
 在业务开发中，我们经常需要通过“数据驱动”做决策。前端页面中的各类打点事件产生大量请求，如何高效、稳定地进行数据采集，成为后端服务设计的重要课题。相比引入复杂的多语言服务，我们可以巧妙利用 Nginx 的轻量高性能特性，搭建一个具备 CORS 支持，既能处理 GET 请求，也能优雅接收 POST 请求体的打点采集服务，满足生产级的需求。
 

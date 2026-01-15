@@ -1,17 +1,14 @@
 ---
 title: K8s采用Operator部署redis-cluster实战指南
+abbrlink: 6024f5c5
+date: '2025-05-10T13:53:34.000Z'
 tags:
-  - Linux
-  - K8s
-  - Operator
-  - Redis
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250520115854685.png'
 toc: true
-abbrlink: 6024f5c5
-date: 2025-05-10 13:53:34
 ---
+
 
 本文将指导您使用 Kubernetes Operator 在 K8s 集群中，高效部署一个高可用的 Redis Cluster。此方案利用 Redis Operator (来自 Opstree) 来自动化 Redis 集群的创建、配置和管理，实现声明式部署。我们将默认配置3主3从的集群，并同样依赖预配置的 StorageClass (如基于 NFS) 实现持久化存储。
 

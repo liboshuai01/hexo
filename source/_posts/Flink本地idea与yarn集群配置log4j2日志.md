@@ -1,16 +1,14 @@
 ---
 title: Flink本地idea与yarn集群配置log4j2日志
+abbrlink: 3429625b
+date: '2024-08-24T11:03:08.000Z'
 tags:
-  - Idea
-  - Flink
-  - Yarn
+  - 大数据
 categories:
   - 大数据
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261104577.png'
 toc: true
-abbrlink: 3429625b
-date: 2024-08-24 11:03:08
 ---
+
 
 在现代分布式系统中，日志记录是确保应用程序稳定性和可维护性的关键部分。Apache Flink作为一款强大的流处理框架，提供了灵活的日志管理功能。本指南将带您了解如何在Flink项目中配置和使用Log4j2，以便在本地和YARN环境中有效地记录日志。通过正确的配置，您可以轻松管理日志输出，监控应用程序的运行状态，并在出现问题时快速定位故障。
 

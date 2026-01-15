@@ -1,14 +1,14 @@
 ---
 title: Linux命令行终端实现简单回收站功能
+abbrlink: bab3c95a
+date: '2024-07-10T01:30:56.000Z'
 tags:
-  - Linux
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504260132291.png '
 toc: true
-abbrlink: bab3c95a
-date: 2024-07-10 01:30:56
 ---
+
 
 在 Linux 系统中，`rm` 命令会直接删除文件，无法撤销。这容易导致误删文件的情况发生。为了避免这种风险，我们可以为 `rm` 命令添加一个回收站功能。本文将介绍如何编写并部署一个 Bash 脚本，使系统中的所有用户在使用 `rm` 命令时，文件会被移动到回收站目录，而不是被永久删除。
 

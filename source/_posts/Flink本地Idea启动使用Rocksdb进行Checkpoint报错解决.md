@@ -1,16 +1,14 @@
 ---
 title: Flink本地Idea启动使用Rocksdb进行Checkpoint报错解决
+abbrlink: d541c343
+date: '2024-12-19T13:37:05.000Z'
 tags:
-  - Flink
-  - Idea
-  - RocksDB
+  - 大数据
 categories:
   - 大数据
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261339889.png'
 toc: true
-abbrlink: d541c343
-date: 2024-12-19 13:37:05
 ---
+
 
 在使用 Flink 与 RocksDB 进行状态管理时，可能会遇到如下异常报错：
 

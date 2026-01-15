@@ -1,15 +1,14 @@
 ---
 title: 解决Flink提交任务时的LinkageError类加载冲突问题
+abbrlink: 27ffd9ad
+date: '2024-04-18T11:20:24.000Z'
 tags:
-  - 报错解决
-  - Flink
+  - 大数据
 categories:
   - 大数据
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425112336634.png'
 toc: true
-abbrlink: 27ffd9ad
-date: 2024-04-18 11:20:24
 ---
+
 
 在 Apache Flink 任务提交到 YARN 集群时，常常会遇到依赖冲突引发的类加载异常，典型表现是：
 

@@ -1,15 +1,14 @@
 ---
 title: Maven配置与IDEA加速优化实用指南
+abbrlink: d1177471
+date: '2024-07-30T01:51:28.000Z'
 tags:
-  - Maven
-  - Idea
+  - 杂货小铺
 categories:
   - 杂货小铺
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504260154739.png'
 toc: true
-abbrlink: d1177471
-date: 2024-07-30 01:51:28
 ---
+
 
 Maven 作为 Java 项目的构建和依赖管理工具，合理的配置不仅能提升构建效率，还能加速依赖包的下载速度。本文将详细介绍如何修改 Maven 的 `settings.xml` 文件，并在 IntelliJ IDEA 中做针对性配置，帮助你实现 Maven 构建的丝滑体验。
 

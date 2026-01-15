@@ -1,15 +1,14 @@
 ---
 title: 常用docker应用部署脚本
+abbrlink: c3c5dc6c
+date: '2024-07-11T00:19:03.000Z'
 tags:
-  - Docker
-  - 中间件
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504270030786.png'
 toc: true
-abbrlink: c3c5dc6c
-date: 2024-07-11 00:19:03
 ---
+
 
 在现代应用开发与运维中，中间件的部署与管理是保障系统稳定高效运行的关键环节。Docker作为轻量级容器化技术，极大简化了中间件的安装、配置和升级流程，提高了环境一致性和部署效率。本文汇总了多款常用中间件的Docker Compose部署文件，包括数据库（MySQL、PostgreSQL、MongoDB）、缓存（Redis）、消息队列（Kafka）、搜索引擎（Elasticsearch）、大数据组件（Doris）以及监控系统（Prometheus、Grafana等）。无论是单机部署还是集群搭建，均提供详尽配置示例，方便开发者和运维人员快速上手，实现一键部署和高效管理。如果您正在规划容器化中间件的部署方案，本篇博文将是您实用且全面的参考资源。
 

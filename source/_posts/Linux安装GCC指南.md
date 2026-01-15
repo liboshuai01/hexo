@@ -1,15 +1,14 @@
 ---
 title: Linux安装GCC指南
+abbrlink: c6d2456d
+date: '2023-12-08T00:05:55.000Z'
 tags:
-  - Linux
-  - GCC
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504270010957.png'
 toc: true
-abbrlink: c6d2456d
-date: 2023-12-08 00:05:55
 ---
+
 
 GCC（GNU Compiler Collection）是 Linux 系统中最主流、最核心的编程语言编译器套件，支持多种语言，如 C、C++、Fortran、Objective-C 等。在 Linux 系统上进行 C/C++ 开发、编译软件或构建内核模块时，GCC 都是必不可少的工具。
 

@@ -1,15 +1,14 @@
 ---
 title: Linux回收站trash-cli详解
+abbrlink: b00127c5
+date: '2024-11-11T13:21:22.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261322213.png'
 toc: true
-abbrlink: b00127c5
-date: 2024-11-11 13:21:22
 ---
+
 
 在 Linux 系统中，误删文件时常令人心痛，却缺少 Windows 那样直观的回收站机制。为避免“手误”导致文件的永久丢失，`trash-cli` 作为一个简单有效的命令行回收站工具，能帮助我们安全地“删除”文件，同时便于恢复和管理。本文将带你全面了解 `trash-cli` 的安装、使用及自动清理方案，实现 Linux 文件管理的安全升级。
 

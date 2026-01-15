@@ -1,16 +1,14 @@
 ---
 title: Linux环境下Maven安装与配置全指南
+abbrlink: 76643a67
+date: '2022-07-08T10:53:45.000Z'
 tags:
   - 环境搭建
-  - Linux
-  - Jdk
 categories:
   - 环境搭建
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261055483.png'
 toc: true
-abbrlink: 76643a67
-date: 2022-07-08 10:53:45
 ---
+
 
 Maven 是目前 Java 项目构建管理中非常重要的工具。使用 Maven 之前，需确保已在系统中安装并配置好 JDK 环境。本文将详尽介绍在 Linux 系统中如何下载、安装及配置 Maven，并对常用配置做出说明，帮助你搭建高效的开发环境。
 

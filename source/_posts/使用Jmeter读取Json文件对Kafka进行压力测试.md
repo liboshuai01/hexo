@@ -1,16 +1,14 @@
 ---
 title: 使用Jmeter读取Json文件对Kafka进行压力测试
+abbrlink: eaa0f0e9
+date: '2024-05-17T15:00:49.000Z'
 tags:
-  - Linux
-  - Jmeter
-  - Kafka
+  - 杂货小铺
 categories:
   - 杂货小铺
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425150219154.png'
 toc: true
-abbrlink: eaa0f0e9
-date: 2024-05-17 15:00:49
 ---
+
 
 最近因为系统开发需要，要模拟业务系统生产业务数据推送到Kafka中。同时对于生成的业务数据有一定逻辑要求，故采用了先使用代码生成测试业务数据到Json文件中，然后通过Jmeter读取Json文件以一定的并发数推送到Kafka中的方案。
 

@@ -1,15 +1,14 @@
 ---
 title: Nginx部署前后端分离项目并实现负载均衡
+abbrlink: 87555684
+date: '2023-02-13T20:00:05.000Z'
 tags:
-  - Linux
-  - Nginx
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504190111406.png'
 toc: true
-abbrlink: '87555684'
-date: 2023-02-13 20:00:05
 ---
+
 
 本文介绍了如何利用 Nginx 部署前后端分离的 Web 项目，并通过 Nginx 反向代理实现后端服务的负载均衡。
 

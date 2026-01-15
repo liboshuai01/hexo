@@ -1,15 +1,14 @@
 ---
 title: Redis集群离线滚动升级全流程解析，确保业务零中断
+abbrlink: ecca5eff
+date: '2024-10-16T11:34:22.000Z'
 tags:
-  - Linux
-  - Redis
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261136169.png'
 toc: true
-abbrlink: ecca5eff
-date: 2024-10-16 11:34:22
 ---
+
 
 近期质保部安全扫描发现我们现有 Redis 集群存在安全漏洞，需尽快升级至最新版本进行修复。鉴于 Redis
 是关键缓存组件，升级过程中需要保证业务系统持续稳定运行，避免任何停机或性能波动。本次升级目标为：

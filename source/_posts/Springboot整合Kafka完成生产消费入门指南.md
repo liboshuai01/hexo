@@ -1,17 +1,14 @@
 ---
 title: Springboot整合Kafka完成生产消费入门指南
+abbrlink: e6e6494a
+date: '2023-11-18T15:35:00.000Z'
 tags:
   - Java
-  - Linux
-  - Kafka
-  - SpringBoot
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505130105979.png'
 toc: true
-abbrlink: e6e6494a
-date: 2023-11-18 15:35:00
 ---
+
 
 在采用Spring Boot与Apache Kafka构建高吞吐、高可靠的消息系统时，我们常常发现网络上的教程大多停留在“Hello World”或基础Demo层面。这些示例虽然能够帮助我们快速上手，但在面对真实的生产环境时，往往显得捉襟见肘，无法应对消息可靠性、消费者行为、异常处理等复杂挑战。
 

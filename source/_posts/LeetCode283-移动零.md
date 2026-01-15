@@ -1,16 +1,14 @@
 ---
 title: LeetCode283-移动零
+abbrlink: e9effdd5
+date: '2025-07-19T14:41:58.000Z'
 tags:
   - 算法
-  - LeetCode
-  - 双指针
 categories:
   - 算法
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250719150050553.png'
 toc: true
-abbrlink: e9effdd5
-date: 2025-07-19 14:41:58
 ---
+
 
 ## 题目
 

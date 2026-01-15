@@ -1,16 +1,14 @@
 ---
 title: 轻松访问K8s集群内部：Windows开发机直连Pod网络实战
+abbrlink: 2b92c30b
+date: '2025-05-12T02:05:52.000Z'
 tags:
-  - Linux
-  - K8s
-  - Windows
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250520115810395.png'
 toc: true
-abbrlink: 2b92c30b
-date: 2025-05-12 02:05:52
 ---
+
 
 作为后端开发者，我们经常需要在本地开发环境中与Kubernetes集群进行交互，特别是在调试或本地测试时，能够直接访问集群内部的Pod和服务网络会极大提高效率。本文将详细介绍如何在同一个局域网环境下，通过配置静态路由和DNS，使您的Windows开发机能够直接访问运行在Linux机器上K3s集群中的Pod网络（以访问`redis-operator`部署的`redis-cluster`为例）。
 

@@ -1,16 +1,14 @@
 ---
 title: 配置Docker国内镜像加速
+abbrlink: c23e4395
+date: '2024-01-11T13:27:55.000Z'
 tags:
-  - Linux
-  - Centos
-  - Docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250424133350742.png'
 toc: true
-abbrlink: c23e4395
-date: 2024-01-11 13:27:55
 ---
+
 
 随着 Docker 在国内的广泛应用，许多开发者都会遇到镜像下载缓慢的问题。由于网络限制，官方 Docker Hub 的访问速度往往很慢，影响开发效率。虽然此前有许多国内镜像加速器，但近年来不少稳定服务相继下线，导致可用加速器日渐稀少。目前，依然有一些由社区维护的镜像加速器为开发者提供了便利。
 

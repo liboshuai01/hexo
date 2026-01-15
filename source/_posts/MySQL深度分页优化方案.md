@@ -1,15 +1,14 @@
 ---
 title: MySQL深度分页优化方案
+abbrlink: c6080851
+date: '2025-01-03T19:56:05.000Z'
 tags:
   - Java
-  - Mysql
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261957784.png'
 toc: true
-abbrlink: c6080851
-date: 2025-01-03 19:56:05
 ---
+
 
 在构建高性能、可扩展的 Web 应用程序时，数据库查询性能往往是影响整体系统响应速度的关键因素之一。尤其是在处理大规模数据时，如何高效地进行分页查询成为了开发者需要重点关注的问题。本文将深入探讨 MySQL 中 `LIMIT ... OFFSET ...` 语法带来的性能挑战，并介绍一种更高效的解决方案——游标分页方法（Cursor Pagination）。
 

@@ -1,15 +1,14 @@
 ---
 title: CentOS系统用户管理入门指南
+abbrlink: ccf5da00
+date: '2024-04-15T11:11:38.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425111246392.png'
 toc: true
-abbrlink: ccf5da00
-date: 2024-04-15 11:11:38
 ---
+
 
 在CentOS系统中，用户管理是日常运维中的重要工作。本文将详细介绍如何创建新用户、设置密码、赋予sudo权限以及切换用户，帮助您高效、安全地管理系统用户。
 

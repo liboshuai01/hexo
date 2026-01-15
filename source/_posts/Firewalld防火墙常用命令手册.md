@@ -1,15 +1,14 @@
 ---
 title: Firewalld防火墙常用命令手册
+abbrlink: 7cdf467c
+date: '2022-07-01T09:59:00.000Z'
 tags:
-  - Linux
-  - 防火墙
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130240764.png'
 toc: true
-abbrlink: 7cdf467c
-date: 2022-07-01 09:59:00
 ---
+
 
 这篇博文详细介绍了 firewalld 防火墙的常用命令及操作方法。首先，文中介绍了如何查看防火墙状态、刷新配置以及启动、停止和设置防火墙服务的开机自启。
 

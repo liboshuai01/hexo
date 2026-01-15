@@ -1,16 +1,14 @@
 ---
 title: Docker重启策略restart参数值的对比与选择
+abbrlink: cecb4f00
+date: '2025-05-15T22:57:57.000Z'
 tags:
-  - Linux
-  - Docker
   - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505180341119.png'
 toc: true
-abbrlink: cecb4f00
-date: 2025-05-15 22:57:57
 ---
+
 
 在现代后端应用部署中，容器化技术已成为标配。Docker 作为其中的佼佼者，提供了强大的容器管理功能。其中，容器的重启策略（Restart Policy）是确保应用高可用性和自我修复能力的关键一环。当容器因错误、资源问题或其他原因意外退出时，一个配置得当的重启策略能够自动尝试恢复服务，减少人工干预，提升系统韧性。
 

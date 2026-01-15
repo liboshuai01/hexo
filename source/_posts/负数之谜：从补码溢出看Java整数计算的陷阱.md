@@ -1,17 +1,14 @@
 ---
 title: 负数之谜：从补码溢出看Java整数计算的陷阱
+abbrlink: 3d712288
+date: '2025-07-16T18:58:18.000Z'
 tags:
-  - 补码
-  - 计算机科学
-  - Java
-  - 整数
+  - 计科基础
 categories:
   - 计科基础
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250716190102147.png'
 toc: true
-abbrlink: 3d712288
-date: 2025-07-16 18:58:18
 ---
+
 
 # 负数之谜：从补码溢出看Java整数计算的陷阱
 

@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署mysql-standalone
+abbrlink: 1ace4f5
+date: '2025-06-11T18:40:02.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Mysql
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250607042527522.png'
 toc: true
-abbrlink: 1ace4f5
-date: 2025-06-11 18:40:02
 ---
+
 
 在云原生时代，将有状态应用（如MySQL）部署到Kubernetes集群已成为标准实践。借助Helm这一强大的包管理工具，我们可以极大地简化部署和生命周期管理的复杂性。本文将详细阐述如何利用Bitnami社区维护的Helm Chart，在Kubernetes上部署一个带监控、配置灵活的MySQL单机实例（Standalone）。
 

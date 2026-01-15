@@ -1,16 +1,14 @@
 ---
 title: LeetCode11-盛最多水的容器
+abbrlink: 2bd734c9
+date: '2025-07-19T15:39:50.000Z'
 tags:
   - 算法
-  - LeetCode
-  - 双指针
 categories:
   - 算法
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250719154521782.png'
 toc: true
-abbrlink: 2bd734c9
-date: 2025-07-19 15:39:50
 ---
+
 
 ## 题目
 

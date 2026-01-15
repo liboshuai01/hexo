@@ -1,15 +1,14 @@
 ---
 title: Linux禁用密码使用密钥登录指南
+abbrlink: d37046a
+date: '2025-07-06T06:06:11.000Z'
 tags:
-  - Linux
-  - Ssh
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250706060731912.png'
 toc: true
-abbrlink: d37046a
-date: 2025-07-06 06:06:11
 ---
+
 
 还在担心密码被暴力破解吗？本文提供了一份清晰、直接的操作指南，将带你一步步为Linux服务器禁用不安全的密码认证，并配置SSH密钥登录，从根本上加固你的服务器安全防线。
 

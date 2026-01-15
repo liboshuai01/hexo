@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署redis-sentinel
+abbrlink: f8f963bc
+date: '2025-06-11T18:56:36.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Redis
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250611190521489.png'
 toc: true
-abbrlink: f8f963bc
-date: 2025-06-11 18:56:36
 ---
+
 
 在现代云原生架构中，缓存系统是提升应用性能、降低后端负载的关键组件。Redis以其卓越的性能和丰富的数据结构，成为了缓存解决方案的首选。然而，在生产环境中，单点的Redis实例存在高可用性风险。为了解决这个问题，Redis Sentinel（哨兵）模式应运而生，它能够自动监控、通知和故障转移，确保Redis服务的连续性。
 

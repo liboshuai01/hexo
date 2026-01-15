@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署redis-cluster
+abbrlink: 2a489a94
+date: '2025-06-11T19:01:53.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Redis
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250611190214435.png'
 toc: true
-abbrlink: 2a489a94
-date: 2025-06-11 19:01:53
 ---
+
 
 在现代云原生架构中，Redis 以其卓越的性能成为缓存、消息队列和会话存储的首选方案。然而，在 Kubernetes 环境中部署一个高可用的 Redis 集群并非易事，它涉及到状态管理、节点发现、配置一致性和故障转移等复杂问题。幸运的是，[Helm](https://helm.sh/) 作为 Kubernetes 的包管理器，极大地简化了这一过程。
 

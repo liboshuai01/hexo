@@ -1,15 +1,14 @@
 ---
 title: Centos部署Hexo个人博客实战指南
+abbrlink: b3552560
+date: 2025-08-01 01:35:19
 tags:
-  - Linux
-  - Hexo
+  - 环境搭建
 categories:
   - 环境搭建
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250408141637337.png'
 toc: true
-abbrlink: b3552560
-date: 2025-04-08 14:15:24
 ---
+
 
 笔者一直以来都习惯于在[稀土掘金](https://juejin.cn/user/1878395516357111)平台进行技术博文的分享和记录。掘金作为一个独立运营的第三方平台，确实提供了优质的技术交流环境和丰富的资源，对技术人来说是一片很好的内容创作天地。然而，随着使用时间的增加，笔者开始意识到自己在数据安全方面的隐患以及平台依赖的问题。
 
@@ -34,11 +33,11 @@ date: 2025-04-08 14:15:24
 sudo yum install -y git
 ```
 
-### 安装nodejs与yarn环境
+### 安装nodejs与pnpm环境
 
 打开[node.js-download](https://nodejs.org/en/download)这个链接，选择符合自己的系统环境复制命令到终端进行下载即可。
 
-![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504130154867.png)
+![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250801013021964.png)
 
 ### 安装nginx环境
 
@@ -107,7 +106,7 @@ sudo chmod +x /root/document/hexo.git/hooks/post-receive
    ```
 
 2. 新增`/etc/nginx/conf.d/blog.conf`配置文件
-   
+
    > 如果仅有公网ip、没有域名的情况，配置文件内容如下
 
    ```txt
@@ -173,7 +172,7 @@ sudo chmod +x /root/document/hexo.git/hooks/post-receive
        }
    }
    ```
-   
+
 3. 重新加载nginx配置
 
    ```shell
@@ -198,21 +197,21 @@ git config --global user.email "liboshuai01@gmail.com"
 git config --global user.name "BoShuai Li"
 ```
 
-### 安装nodejs与yarn环境
+### 安装nodejs与pnpm环境
 
-> 要有科学的魔法哦，不然会yarn会安装失败的哦！
+> 要有科学的魔法哦，不然会pnpm会安装失败的哦！
 
-打开[node-v18.20.8-x64.msi](https://nodejs.org/dist/v18.20.8/node-v18.20.8-x64.msi)这个链接，会自动下载`node.js`的`v18.20.8`版本安装包。
+打开[node-v22.17.1-x64.msi](https://nodejs.org/dist/v22.17.1/node-v22.17.1-x64.msi)这个链接，会自动下载`node.js`的`v22.17.1`版本安装包。
 打开安装程序，一路下一步即可，然后使用管理员权限打开`Git Bash`。执行以下命令：
 ```bash
 # Verify the Node.js version:
-node -v # Should print "v18.20.8".
+node -v # Should print "v22.17.1".
 
-# Download and install Yarn:
-corepack enable yarn
+# Download and install pnpm:
+corepack enable pnpm
 
-# Verify Yarn version:
-yarn -v
+# Verify pnpm version:
+pnpm -v
 ```
 
 ### 安装hexo环境
@@ -221,34 +220,34 @@ yarn -v
 
 2. 在新建的目录中打开`git bash`终端，执行下面的命令。
 
-    > 一定要在`C:\Me\Project\other`目录下执行
+   > 一定要在`C:\Me\Project\other`目录下执行
 
     ```shell
     # 全局安装hexo-cli
-    yarn global add hexo-cli
+    pnpm add -g hexo-cli
     # 创建并进入博客目录
     hexo init blog && cd blog
     # 安装项目依赖
-    yarn install
+    pnpm install
     # 启动Hexo本地服务
     hexo s
     ```
-        
-    > 下面是安装结束后的目录结构
 
-    ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250408145801328.png)
+   > 下面是安装结束后的目录结构
 
-    > 在浏览器打开`http://localhost:4000`查看页面
+   ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250408145801328.png)
 
-    ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250408144547941.png)
+   > 在浏览器打开`http://localhost:4000`查看页面
+
+   ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250408144547941.png)
 
 3. 安装butterfly主题
 
-    > 一定要在`C:\Me\Project\other\blog`目录下执行
-    
+   > 一定要在`C:\Me\Project\other\blog`目录下执行
+
    ```shell
    # 安装主题依赖
-   yarn add hexo-renderer-pug hexo-renderer-stylus hexo-deployer-git hexo-abbrlink hexo-wordcount hexo-generator-searchdb
+   pnpm add hexo-renderer-pug hexo-renderer-stylus hexo-deployer-git hexo-abbrlink hexo-wordcount hexo-generator-searchdb
    # git clone主题
    git clone -b master https://github.com/jerryc127/hexo-theme-butterfly.git themes/butterfly
    
@@ -258,7 +257,7 @@ yarn -v
    # 启动Hexo本地服务
    hexo clean && hexo s --debug
    ```
-   
+
    > 在浏览器打开`http://localhost:4000`查看页面
 
 4. 配置远程部署地址，修改`_config.yml`文件中的`deploy`项
@@ -271,7 +270,7 @@ yarn -v
      repo: ssh://root@106.14.19.58:22222/root/document/hexo.git
      branch: master
    ```
-   
+
 5. 配置本地SSH免密登录服务器（使用git bash）
 
    ```shell
@@ -281,19 +280,19 @@ yarn -v
    # 当然也可以自己手动将生成的`id_rsa.pub`文件内容拷贝到服务器上的`~/.ssh/authorized_keys`文件中
    ssh -p 22222 root@106.14.19.58 "cat >> ~/.ssh/authorized_keys" < C:/Users/libos/.ssh/id_rsa.pub
    ```
-   
+
    > 现在需要测试一下本地是否可以免密登录到服务器了
 
    ```shell
    ssh -p 22222 root@106.14.19.58
    ```
-   
+
 6. 发布博客内容到服务器
-   
+
    ```shell
    hexo clean && hexo d -g
    ```
-   
+
 7. 浏览器打开`https://lbs.wiki`链接访问博客页面，进行查看
 
 ## 主题美化

@@ -1,16 +1,14 @@
 ---
 title: SpringBoot使用Jedis整合Redis集群
+abbrlink: 45b1597
+date: '2024-06-28T01:23:47.000Z'
 tags:
   - Java
-  - SpringBoot
-  - Redis
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504260127545.png'
 toc: true
-abbrlink: 45b1597
-date: 2024-06-28 01:23:47
 ---
+
 
 Spring Boot 默认使用 Lettuce 作为 Redis 客户端，它支持响应式编程且易于使用。但在部分低版本 Spring Boot 中，Lettuce 与 Redis 集群存在版本兼容性问题，导致连接不稳定或无法连接集群。鉴于此，采用 Jedis 客户端作为 Redis 集群的连接方案成为了切实可行的替代方案。
 

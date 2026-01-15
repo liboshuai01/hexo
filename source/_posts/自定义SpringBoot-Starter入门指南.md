@@ -1,15 +1,14 @@
 ---
 title: 自定义SpringBoot-Starter入门指南
+abbrlink: 857d16b8
+date: '2022-02-04T17:33:53.000Z'
 tags:
   - Java
-  - SpringBoot
 categories:
   - Java
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250424173823338.png'
 toc: true
-abbrlink: 857d16b8
-date: 2022-02-04 17:33:53
 ---
+
 
 在现代微服务架构中，统一的请求日志记录是保障系统可观测性和问题排查的重要基础。虽然 Spring Boot 提供了丰富的日志支持，但在多项目中重复配置和开发请求日志功能，难免造成代码冗余和维护成本升高。通过打造自主的自定义 Starter，我们可以将统一请求日志模块封装成独立组件，实现跨项目复用和快速集成。
 

@@ -1,17 +1,14 @@
 ---
 title: K8s采用Helm部署kafka-cluster
 abbrlink: c4730ed2
-date: 2025-06-11 19:34:00
+date: '2025-06-11T19:34:00.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
-  - Kafka
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250611193529858.png'
 toc: true
 ---
+
 
 在当今的云原生时代，将像 Kafka 这样的有状态数据系统部署到 Kubernetes (K8s) 上已成为主流实践。Kubernetes 提供了强大的弹性伸缩、故障自愈和资源管理能力，而 Helm 作为 K8s 的包管理器，则极大地简化了复杂应用的部署和生命周期管理。
 

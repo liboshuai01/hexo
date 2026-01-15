@@ -1,16 +1,14 @@
 ---
 title: 避免Docker镜像导出导入踩坑，杜绝悬浮镜像实用指南
+abbrlink: 61dba0f
+date: '2022-12-11T00:17:52.000Z'
 tags:
-  - Linux
-  - Centos
-  - Docker
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504240019254.png'
 toc: true
-abbrlink: 61dba0f
-date: 2022-12-11 00:17:52
 ---
+
 
 在日常开发和运维中，我们经常需要将 Docker 镜像导出为文件、在其他环境导入使用。常用的命令是：
 

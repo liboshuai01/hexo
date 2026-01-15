@@ -1,16 +1,14 @@
 ---
 title: Kafka集群接入Prometheus监控预警系统
-tags:
-   - Linux
-   - Kafka
-   - Prometheus
-categories:
-   - 监控预警
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425142636317.png'
-toc: true
 abbrlink: d83294c3
-date: 2024-04-24 14:25:23
+date: '2024-04-24T14:25:23.000Z'
+tags:
+  - 监控预警
+categories:
+  - 监控预警
+toc: true
 ---
+
 
 本文将指导您如何配置 Kafka 集群的监控系统，使用 Prometheus 和 Grafana 进行数据可视化。该过程包括安装 Kafka exporter、配置 Prometheus 和 Grafana，以便有效监控 Kafka 集群的性能和状态。
 

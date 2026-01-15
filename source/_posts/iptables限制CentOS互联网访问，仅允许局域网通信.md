@@ -1,15 +1,14 @@
 ---
 title: iptables限制CentOS互联网访问，仅允许局域网通信
+abbrlink: 15c8f145
+date: '2023-12-05T11:28:39.000Z'
 tags:
-  - Linux
-  - Centos
+  - 运维手册
 categories:
   - 运维手册
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250423112928764.png'
 toc: true
-abbrlink: 15c8f145
-date: 2023-12-05 11:28:39
 ---
+
 
 在某些情况下，我们希望临时阻止 CentOS 服务器访问互联网，且防止互联网访问该服务器，但仍然允许与局域网内设备的通信。这样做可以用于安全隔离、测试或维护场景。本文将介绍如何通过 `iptables` 实现这一目标，包括具体命令和保存规则的方法。
 

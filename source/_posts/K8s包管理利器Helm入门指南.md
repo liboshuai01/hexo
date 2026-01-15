@@ -1,16 +1,14 @@
 ---
 title: K8s包管理利器Helm入门指南
+abbrlink: 2eda4ff
+date: '2025-05-05T03:15:02.000Z'
 tags:
-  - Linux
-  - K8s
-  - Helm
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505050317333.png'
 toc: true
-abbrlink: 2eda4ff
-date: 2025-05-05 03:15:02
 ---
+
 
 大家好！作为一名后端开发者，我们在构建和部署可扩展应用时，经常与 Kubernetes 打交道。Kubernetes 本身非常强大，但管理其上的应用程序配置和部署流程有时会变得复杂。这时，Helm 就闪亮登场了！Helm 被称为 "Kubernetes 的包管理器"，它极大地简化了 Kubernetes 应用的查找、分享、安装和升级过程。
 

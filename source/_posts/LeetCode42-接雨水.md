@@ -1,16 +1,14 @@
 ---
 title: LeetCode42-接雨水
+abbrlink: 625d00ec
+date: '2025-07-20T18:21:27.000Z'
 tags:
   - 算法
-  - LeetCode
-  - 双指针
 categories:
   - 算法
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250720182945519.png'
 toc: true
-abbrlink: 625d00ec
-date: 2025-07-20 18:21:27
 ---
+
 
 ## 题目
 

@@ -1,14 +1,14 @@
 ---
 title: Redis常用命令手册
-abbrlink: '92429955'
-date: 2024-08-27 10:59:15
+abbrlink: 92429955
+date: '2024-08-27T10:59:15.000Z'
 tags:
-  - Redis
+  - 大数据
 categories:
   - 大数据
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202504261101845.png'
 toc: true
 ---
+
 
 Redis是一款开源的高性能内存数据库，广泛应用于缓存、消息队列、排行榜等场景。它支持丰富的数据类型和多样化的操作命令，满足不同业务需求。为了帮助开发者快速掌握Redis的核心命令，本文汇总了键值操作、字符串、列表、集合、哈希、有序集合等常用命令，并介绍了Bitmaps、HyperLogLog、Geospatial等新特性，涵盖了Redis服务管理的基本指令。无论是入门学习还是日常使用，这份速览都能成为您高效使用Redis的实用参考。
 

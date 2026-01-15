@@ -1,16 +1,14 @@
 ---
 title: Flink应用接入Prometheus监控预警系统
-tags:
-   - Linux
-   - Kafka
-   - Prometheus
-categories:
-   - 监控预警
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425143129514.png'
-toc: true
 abbrlink: 9585b017
-date: 2024-04-28 14:35:01
+date: '2024-04-28T14:35:01.000Z'
+tags:
+  - 监控预警
+categories:
+  - 监控预警
+toc: true
 ---
+
 
 在现代数据处理和监控领域，Apache Flink 作为实时流处理框架，已经在众多企业和场景中得到广泛应用。为了更好地监控和管理 Flink 应用的性能与资源利用情况，将 Flink 集成至 Prometheus 和 Grafana 是一个非常有效的方法。本文详细介绍了如何搭建和配置这一监控系统，确保你可以实时跟踪和优化你的 Flink 应用。
 

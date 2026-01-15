@@ -1,18 +1,14 @@
 ---
 title: 非root用户执行K3s集群的kubectl命令
+abbrlink: 96dde92b
+date: '2025-05-18T01:42:59.000Z'
 tags:
-  - Linux
-  - Centos
-  - Docker
-  - K8s
-  - k3s
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/202505180144334.png'
 toc: true
-abbrlink: 96dde92b
-date: 2025-05-18 01:42:59
 ---
+
 
 在部署 K3s 轻量级 Kubernetes 集群后，默认生成的集群配置文件（kubeconfig）通常位于 `/etc/rancher/k3s/k3s.yaml`，且其所有者和权限设定通常只允许 root 用户访问。为了遵循安全最佳实践并在日常管理中使用普通用户执行 `kubectl` 命令与集群进行交互，我们需要进行一些配置。本文将详细介绍如何让非 root 用户安全、便捷地使用 `kubectl` 管理 K3s 集群。
 

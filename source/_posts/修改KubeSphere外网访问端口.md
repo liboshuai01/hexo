@@ -1,15 +1,14 @@
 ---
 title: 修改KubeSphere外网访问端口
+abbrlink: 22e6c961
+date: '2024-03-28T10:29:27.000Z'
 tags:
-  - Linux
-  - k8s
+  - 容器化
 categories:
   - 容器化
-cover: 'https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250425103016448.png'
 toc: true
-abbrlink: 22e6c961
-date: 2024-03-28 10:29:27
 ---
+
 
 KubeSphere 作为一款强大的容器管理平台，其默认的外网访问端口是 30880。在实际企业网络环境中，出于安全策略或网络规划的考虑，用户可能需要将该端口调整为其它符合公司规范的端口号，以确保访问的灵活性和合规性。本文将详细介绍如何修改 KubeSphere 的外网访问端口，帮助您高效便捷地完成定制化配置。
 
