@@ -3,9 +3,9 @@ title: 解密CompletableFuture 中 thenApply 与 thenCompose 的底层区别
 abbrlink: 84eb02dd
 date: 2025-08-05 02:17:57
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

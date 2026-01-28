@@ -1,7 +1,7 @@
 ---
-title: Git命令行安全回滚已推送的Merge合并提交
+title: Git回滚已经Push的Merge提交
 abbrlink: 31d08c34
-date: '2025-04-23T18:18:30.000Z'
+date: 2026-01-20 00:34:20
 tags:
   - 杂货小铺
 categories:

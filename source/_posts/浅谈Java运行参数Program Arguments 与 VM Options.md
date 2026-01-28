@@ -3,9 +3,9 @@ title: 浅谈Java运行参数Program Arguments 与 VM Options
 abbrlink: ff28cd3
 date: '2024-12-25T13:41:31.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

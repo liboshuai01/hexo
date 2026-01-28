@@ -3,9 +3,9 @@ title: Spring Boot 集成 Jasypt 实现敏感信息加密保护
 abbrlink: c6d0d078
 date: '2025-03-14T23:39:44.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

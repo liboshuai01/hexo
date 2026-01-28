@@ -3,9 +3,9 @@ title: SpringBoot项目中策略模式与简单工厂、模板方法的优雅融
 abbrlink: af5fe467
 date: '2022-01-08T17:25:08.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

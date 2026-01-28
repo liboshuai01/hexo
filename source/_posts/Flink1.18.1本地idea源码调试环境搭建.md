@@ -1,7 +1,7 @@
 ---
-title: Flink1.18本地idea源码调试环境搭建
+title: Flink1.18.1本地idea源码调试环境搭建
 abbrlink: d1ff1ddd
-date: 2025-08-02 05:52:12
+date: 2026-01-23 12:35:57
 tags:
   - 大数据
 categories:
@@ -10,7 +10,7 @@ toc: true
 ---
 
 
-Apache Flink 作为业界领先的流处理和批处理统一计算引擎，其强大的功能与复杂的内部机制吸引了无数开发者深入探索。对于后端开发者而言，能够直接在本地 IDE 中调试 Flink 源码，无疑是提升理解、快速定位问题、甚至参与社区贡献的利器。然而，搭建这样一个庞大项目的本地调试环境，尤其是特定版本如 Flink 1.18，往往涉及到诸多配置细节，令不少初学者望而却步。本篇博文旨在提供一份详尽的、按部就班的指南，帮助您在 Windows 系统下，使用 IntelliJ IDEA 顺利搭建起 Flink 1.18 的源码调试环境。通过本文的指引，您将能够轻松配置项目、编译源码，并成功启动一个可供调试的本地 Flink Standalone 集群，为您的 Flink 深度学习之旅奠定坚实基础。
+Apache Flink 作为业界领先的流处理和批处理统一计算引擎，其强大的功能与复杂的内部机制吸引了无数开发者深入探索。对于后端开发者而言，能够直接在本地 IDE 中调试 Flink 源码，无疑是提升理解、快速定位问题、甚至参与社区贡献的利器。然而，搭建这样一个庞大项目的本地调试环境，尤其是特定版本如 Flink 1.18.1，往往涉及到诸多配置细节，令不少初学者望而却步。本篇博文旨在提供一份详尽的、按部就班的指南，帮助您在 Windows 系统下，使用 IntelliJ IDEA 顺利搭建起 Flink 1.18.1 的源码调试环境。通过本文的指引，您将能够轻松配置项目、编译源码，并成功启动一个可供调试的本地 Flink Standalone 集群，为您的 Flink 深度学习之旅奠定坚实基础。
 
 <!-- more -->
 
@@ -21,7 +21,7 @@ Apache Flink 作为业界领先的流处理和批处理统一计算引擎，其�
 环境准备
 ---
 
-1. windows系统
+1. windows/linux
 2. 安装jdk1.8并配置好环境变量
 3. 安装git
 4. 安装idea
@@ -31,18 +31,55 @@ Apache Flink 作为业界领先的流处理和批处理统一计算引擎，其�
 
 **1. git配置**
 
+**通用配置（在 Windows 和 Linux 下都执行）**
 ```shell
-# 配置全局用户名称
+# [基础身份]
 git config --global user.name "Your Name"
-# 配置全局用户邮箱
 git config --global user.email "your.email@example.com"
 
-# 禁用对 NTFS 保护性限制（谨慎使用，可能降低文件系统安全性）
-git config --global core.protectNTFS false
-# 让 Git 显示中文文件名而不是乱码
+# [显示优化] 让 git status 显示中文文件名，而不是 \346\265... 乱码
 git config --global core.quotepath false
-# 允许处理超过 260 字符的路径（主要针对 Windows 系统）
+
+# [行为优化] git pull 时默认使用 rebase 模式
+# 作用：避免在拉取代码时产生无意义的 "Merge branch..." 提交记录，保持提交线是一条直线。
+git config --global pull.rebase true
+
+# [行为优化] 新建仓库时默认分支名为 main (代替过时的 master)
+git config --global init.defaultBranch main
+
+# [效率提升] 常用命令简写别名 (可选，强烈推荐)
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.ci commit
+git config --global alias.br branch
+# 一个非常酷的 log 查看命令：显示提交图谱、精简信息
+git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+```
+
+**仅Windows下执行**
+```shell
+# [核心兼容] 提交转 LF，检出转 CRLF (适配 Windows 编辑器)
+git config --global core.autocrlf true
+
+# [Java开发必备] 开启长路径支持
+# Java 项目层级深、类名长，很容易突破 Windows 260 字符限制，此项必须开启
 git config --global core.longpaths true
+
+# [权限忽略] 建议开启
+# 因为 Windows (NTFS) 和 Linux (Ext4) 的文件权限模型不同 (如 755/644)，
+# 防止因为文件权限变动导致 Git 认为文件被修改。
+git config --global core.filemode false
+```
+
+**仅Linux下执行**
+```shell
+# [核心兼容] 提交转 LF，检出不转换 (保持 Linux 原生 LF)
+git config --global core.autocrlf input
+
+# [安全检查] 开启对 NTFS 文件名的保护 (即使在 Linux 上)
+# 作用：防止你在 Linux 上创建了 Windows 无法识别的文件名（如含冒号、尾随空格等），
+# 导致你切回 Windows 系统时报错。
+git config --global core.protectNTFS true
 ```
 
 **2. 拉取源码**
@@ -53,53 +90,39 @@ git clone https://github.com/apache/flink.git
 
 **3. 切换分支**
 
-> 进入flink项目根目录
-
 ```shell
-git checkout -b flink-1.18 origin/release-1.18
+cd ./flink
+git checkout -b learning/release-1.18.1 release-1.18.1
 ```
 
-**4. 配置maven编译jdk版本**
-
-编写项目根目录下的`pom.xml`文件，定位到1702行，添加如下内容：
-```xml
-<configuration>
-    <source>${maven.compiler.source}</source>
-    <target>${maven.compiler.target}</target>
-</configuration>
-```
-添加后的`plugin`标签中的内容如下：
-```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <!-- 新增内容 -->
-    <configuration>
-        <source>${maven.compiler.source}</source>
-        <target>${maven.compiler.target}</target>
-    </configuration>
-</plugin>
-```
-
-添加如上内容后，记得在idea中点击重新加载maven配置文件。
-
-**5. idea安装scala插件**
+**4. idea安装scala插件**
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605135559429.png)
 
-**6. idea配置maven**
+**5. idea配置maven**
 
 > 因为已经科学上网了，所以本地的maven配置文件`setting.xml`只需要配置一下本地仓库地址即可
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605135724091.png)
 
-**7. idea配置Project Structure**
+**6. idea配置Project Structure**
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605135941465.png)
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605140144572.png)
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605140320603.png)
+
+**7. 安装 Python**
+
+```shell
+# windows
+winget install Python.Python.3
+
+# debian/ubuntu
+sudo apt update
+sudo apt install build-essential python3
+```
 
 **8. 执行maven打包**
 
@@ -115,8 +138,8 @@ mvn clean install -DskipTests -Pfast -U
 
 ```shell
 mkdir -p {conf,distlib}
-cp -r ./flink-dist/target/flink-1.18-SNAPSHOT-bin/flink-1.18-SNAPSHOT/conf/* ./conf
-cp -r ./flink-dist/target/flink-1.18-SNAPSHOT-bin/flink-1.18-SNAPSHOT/lib/* ./distlib
+cp -r ./flink-dist/target/flink-1.18.1-bin/flink-1.18.1/conf/* ./conf
+cp -r ./flink-dist/target/flink-1.18.1-bin/flink-1.18.1/lib/* ./distlib
 ```
 
 启动master
@@ -196,12 +219,12 @@ taskmanager.memory.jvm-overhead.min: 128m
 **1. 打包生成示例jar包**
 
 ```shell
-git clone https://github.com/liboshuai01/lbs-demo.git
-cd ./lbs-demo/flink-wordcount
+git clone https://github.com/liboshuai01/learn.git
+cd ./learn/flink/flink-example
 mvn clean install -DskipTests
 ```
 
-然后拷贝`target`中的`flink-wordcount-1.0.jar`到flink项目根目录的`distlib`文件夹中。
+然后拷贝`target`中的`flink-example-1.0-SNAPSHOT.jar`到flink项目根目录的`distlib`文件夹中。
 
 **2. 找到提交作业入口类**
 
@@ -210,9 +233,9 @@ mvn clean install -DskipTests
 **3. 修改启动类启动配置**
 
 > Add vm options: `-Dlog.file=./log/flink-hunter-client-hunter.log -Dlog4j.configuration=./conf/log4j-cli.properties -Dlog4j.configurationFile=./conf/log4j-cli.properties -Dlogback.configurationFile=./conf/logback-console.xml `
-> 
-> Program arguments: `run -c com.liboshuai.demo.FlinkWordCountDemo ./distlib/flink-wordcount-1.0.jar`
-> 
+>
+> Program arguments: `run -c cn.liboshuai.learn.flink.example.WordCount ./distlib/flink-example-1.0-SNAPSHOT.jar`
+>
 > Environment variables: `FLINK_CONF_DIR=./conf`
 
 ![](https://lbs-images.oss-cn-shanghai.aliyuncs.com/20250605185435332.png)

@@ -3,9 +3,9 @@ title: 告别通用 Exception：为何你的项目需要一套自定义异常体
 abbrlink: 3b24c8b5
 date: '2025-06-18T11:09:14.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

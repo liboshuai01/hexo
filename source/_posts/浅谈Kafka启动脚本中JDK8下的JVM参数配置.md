@@ -3,9 +3,9 @@ title: 浅谈Kafka启动脚本中JDK8下的JVM参数配置
 abbrlink: fc13aeb
 date: '2025-04-11T13:10:25.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

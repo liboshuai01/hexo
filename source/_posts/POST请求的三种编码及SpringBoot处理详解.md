@@ -3,9 +3,9 @@ title: POST请求的三种编码及SpringBoot处理详解
 abbrlink: 4b2ec951
 date: '2024-08-06T10:13:07.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

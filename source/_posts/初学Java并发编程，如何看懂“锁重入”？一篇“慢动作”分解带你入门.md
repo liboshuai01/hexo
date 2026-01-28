@@ -3,9 +3,9 @@ title: 初学Java并发编程，如何看懂“锁重入”？一篇“慢动作
 abbrlink: 462e4671
 date: 2025-08-05 05:48:11
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

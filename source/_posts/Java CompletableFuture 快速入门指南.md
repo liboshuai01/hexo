@@ -3,9 +3,9 @@ title: Java CompletableFuture 快速入门指南
 abbrlink: bc1559a5
 date: 2025-08-04 04:26:33
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

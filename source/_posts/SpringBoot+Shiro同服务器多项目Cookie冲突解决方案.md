@@ -3,9 +3,9 @@ title: SpringBoot+Shiro同服务器多项目Cookie冲突解决方案
 abbrlink: f4c35ddb
 date: '2025-04-22T14:28:59.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

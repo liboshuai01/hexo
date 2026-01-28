@@ -3,9 +3,9 @@ title: Springboot整合Kafka完成生产消费入门指南
 abbrlink: e6e6494a
 date: '2023-11-18T15:35:00.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

@@ -3,9 +3,9 @@ title: SpringBoot整合ELK日志
 abbrlink: 7444ad67
 date: '2023-02-27T16:08:38.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

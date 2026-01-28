@@ -3,9 +3,9 @@ title: 深入解析DCL单例模式：为何volatile不可或缺？
 abbrlink: b0f15470
 date: 2025-08-06 07:46:25
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

@@ -3,9 +3,9 @@ title: 自定义SpringBoot-Starter入门指南
 abbrlink: 857d16b8
 date: '2022-02-04T17:33:53.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

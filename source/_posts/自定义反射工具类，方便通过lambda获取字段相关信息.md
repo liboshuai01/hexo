@@ -3,9 +3,9 @@ title: 自定义反射工具类，方便通过lambda获取字段相关信息
 abbrlink: 6e0a2623
 date: '2024-08-19T10:28:51.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

@@ -3,9 +3,9 @@ title: SpringBoot中MongoDB大数据量查询慢因实体映射性能瓶颈优�
 abbrlink: 5e9e3754
 date: '2022-01-19T17:16:59.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

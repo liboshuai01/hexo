@@ -3,9 +3,9 @@ title: Java并发编程中的Volatile什么时候可以使用，什么时候不�
 abbrlink: 164a1666
 date: 2025-08-05 23:40:59
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

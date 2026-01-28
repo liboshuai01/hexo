@@ -3,9 +3,9 @@ title: Java对象映射利器MapStruct应用详解与实战指南
 abbrlink: a5d24d11
 date: '2024-12-25T13:45:54.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

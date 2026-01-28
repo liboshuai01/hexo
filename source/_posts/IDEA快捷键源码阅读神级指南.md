@@ -3,9 +3,9 @@ title: IDEA快捷键源码阅读神级指南
 abbrlink: 8167302a
 date: 2025-10-02 04:12:13
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

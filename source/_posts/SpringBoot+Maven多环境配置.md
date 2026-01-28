@@ -3,9 +3,9 @@ title: SpringBoot+Maven多环境配置
 abbrlink: 92bf4e1a
 date: '2022-12-02T08:01:00.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

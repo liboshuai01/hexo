@@ -3,9 +3,9 @@ title: 非SpringBoot环境下Jedis工具操作Redis集群实战指南
 abbrlink: c2e80da6
 date: '2024-08-20T10:36:39.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

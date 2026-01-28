@@ -3,9 +3,9 @@ title: 基于SpringBoot的项目骨架快速搭建与实战教程
 abbrlink: a4d0387e
 date: '2023-12-18T12:59:57.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

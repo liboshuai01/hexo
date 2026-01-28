@@ -3,9 +3,9 @@ title: SpringBoot与Jackson高效整合指南（附实用工具类与示例）
 abbrlink: ccabcaf2
 date: '2023-12-18T13:13:33.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

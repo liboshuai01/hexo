@@ -3,9 +3,9 @@ title: 从CPU的视角看Java多线程：我们为何需要 CompletableFuture？
 abbrlink: e70d5b22
 date: 2025-08-05 02:40:38
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

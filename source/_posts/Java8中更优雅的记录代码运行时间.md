@@ -3,9 +3,9 @@ title: Java8中更优雅的记录代码运行时间
 abbrlink: 484517b9
 date: '2023-04-19T16:32:25.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

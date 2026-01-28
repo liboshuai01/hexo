@@ -3,9 +3,9 @@ title: MySQL深度分页优化方案
 abbrlink: c6080851
 date: '2025-01-03T19:56:05.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

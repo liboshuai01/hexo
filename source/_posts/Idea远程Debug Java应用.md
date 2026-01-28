@@ -3,9 +3,9 @@ title: Idea远程Debug Java应用
 abbrlink: ca0352df
 date: '2023-08-29T17:08:12.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

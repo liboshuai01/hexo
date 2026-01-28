@@ -3,9 +3,9 @@ title: 利用SpringAOP实现方法执行时间统计与日志记录
 abbrlink: d87c6abc
 date: '2024-08-19T10:32:14.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

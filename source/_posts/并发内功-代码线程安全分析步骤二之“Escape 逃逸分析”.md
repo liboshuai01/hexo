@@ -3,9 +3,9 @@ title: 并发内功-代码线程安全分析步骤二之“Escape 逃逸分析�
 abbrlink: 6b9ba70b
 date: 2025-11-25 09:33:02
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

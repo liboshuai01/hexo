@@ -3,9 +3,9 @@ title: SpringBoot整合Redis单机/哨兵/集群模式指南
 abbrlink: 31c79302
 date: '2023-07-21T00:04:11.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

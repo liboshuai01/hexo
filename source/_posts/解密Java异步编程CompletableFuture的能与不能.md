@@ -3,9 +3,9 @@ title: 解密Java异步编程CompletableFuture的能与不能
 abbrlink: b4a8b8f3
 date: 2025-08-04 07:48:06
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

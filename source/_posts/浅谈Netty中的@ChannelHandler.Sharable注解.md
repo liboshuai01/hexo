@@ -3,9 +3,9 @@ title: 浅谈Netty中的@ChannelHandler.Sharable注解
 abbrlink: 895b671e
 date: '2024-12-05T13:32:37.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

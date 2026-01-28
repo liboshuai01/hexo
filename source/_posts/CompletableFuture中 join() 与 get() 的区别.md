@@ -3,9 +3,9 @@ title: CompletableFuture中 join() 与 get() 的区别
 abbrlink: faf07427
 date: 2025-08-04 07:19:41
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 

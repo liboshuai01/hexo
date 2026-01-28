@@ -3,9 +3,9 @@ title: SpringBoot使用Jedis整合Redis集群
 abbrlink: 45b1597
 date: '2024-06-28T01:23:47.000Z'
 tags:
-  - Java
+  - java
 categories:
-  - Java
+  - java
 toc: true
 ---
 
